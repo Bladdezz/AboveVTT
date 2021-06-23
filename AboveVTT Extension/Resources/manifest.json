@@ -1,0 +1,43 @@
+{
+  "manifest_version": 2,
+"name": "AboveVTT",
+"description": "Integrated VTT for D&DBeyond",
+"version": "0.51",
+"content_scripts":[
+    {
+      "matches":[
+        "https://www.dndbeyond.com/campaigns/*"
+      ],
+      "js": ["Load.js"]
+    }
+  ],
+"permissions": [],
+"icons":{"128":"icon.png"},
+"web_accessible_resources": [
+	"SoundPad.js",
+	"MonsterDice.js",
+	"Fog.js",
+	"Main.js",
+	"Jitsi.js",
+	"MessageBroker.js",
+	"ScenesHandler.js",
+	"MonsterPanel.js",
+	"ScenesPanel.js",
+	"Token.js",
+	"Style.css",
+	"PlayerPanel.js",
+	"jquery.contextMenu.js",
+	"jquery.contextMenu.css",
+	"rpg-dice-roller.bundle.min.js",
+	"StatHandler.js",
+	"CombatTracker.js",
+	"jquery.ui.touch-punch.js",
+	"SceneData.js",
+	"TokenMenu.js",
+	"color-picker.js",
+	"purify.min.js",
+	"abovevtt.css",
+	"color-picker.min.css",
+	"assets/*"
+	]
+}

@@ -1,0 +1,618 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D86A27FD2683935B00E31918 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86A27FC2683935B00E31918 /* AppDelegate.swift */; };
+		D86A28002683935B00E31918 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D86A27FE2683935B00E31918 /* Main.storyboard */; };
+		D86A28022683935B00E31918 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86A28012683935B00E31918 /* ViewController.swift */; };
+		D86A28042683935C00E31918 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86A28032683935C00E31918 /* Assets.xcassets */; };
+		D86A280B2683935C00E31918 /* AboveVTT Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = D86A280A2683935C00E31918 /* AboveVTT Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D86A28102683935C00E31918 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D86A280F2683935C00E31918 /* Cocoa.framework */; };
+		D86A28132683935C00E31918 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D86A28122683935C00E31918 /* SafariWebExtensionHandler.swift */; };
+		D86A283E2683935D00E31918 /* purify.min.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28202683935D00E31918 /* purify.min.js */; };
+		D86A283F2683935D00E31918 /* abovevtt.css in Resources */ = {isa = PBXBuildFile; fileRef = D86A28212683935D00E31918 /* abovevtt.css */; };
+		D86A28402683935D00E31918 /* jquery.contextMenu.css in Resources */ = {isa = PBXBuildFile; fileRef = D86A28222683935D00E31918 /* jquery.contextMenu.css */; };
+		D86A28412683935D00E31918 /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = D86A28232683935D00E31918 /* icon.png */; };
+		D86A28422683935D00E31918 /* MonsterDice.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28242683935D00E31918 /* MonsterDice.js */; };
+		D86A28432683935D00E31918 /* jquery.contextMenu.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28252683935D00E31918 /* jquery.contextMenu.js */; };
+		D86A28442683935D00E31918 /* Fog.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28262683935D00E31918 /* Fog.js */; };
+		D86A28452683935D00E31918 /* ScenesPanel.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28272683935D00E31918 /* ScenesPanel.js */; };
+		D86A28462683935D00E31918 /* MonsterPanel.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28282683935D00E31918 /* MonsterPanel.js */; };
+		D86A28472683935D00E31918 /* LICENSE in Resources */ = {isa = PBXBuildFile; fileRef = D86A28292683935D00E31918 /* LICENSE */; };
+		D86A28482683935D00E31918 /* ScenesHandler.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A282A2683935D00E31918 /* ScenesHandler.js */; };
+		D86A28492683935D00E31918 /* PrivacyPolicy.txt in Resources */ = {isa = PBXBuildFile; fileRef = D86A282B2683935D00E31918 /* PrivacyPolicy.txt */; };
+		D86A284A2683935D00E31918 /* StatHandler.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A282C2683935D00E31918 /* StatHandler.js */; };
+		D86A284B2683935D00E31918 /* SoundPad.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A282D2683935D00E31918 /* SoundPad.js */; };
+		D86A284C2683935D00E31918 /* jquery.ui.touch-punch.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A282E2683935D00E31918 /* jquery.ui.touch-punch.js */; };
+		D86A284D2683935D00E31918 /* MessageBroker.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A282F2683935D00E31918 /* MessageBroker.js */; };
+		D86A284E2683935D00E31918 /* Token.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28302683935D00E31918 /* Token.js */; };
+		D86A284F2683935D00E31918 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = D86A28312683935D00E31918 /* README.md */; };
+		D86A28502683935D00E31918 /* rpg-dice-roller.bundle.min.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28322683935D00E31918 /* rpg-dice-roller.bundle.min.js */; };
+		D86A28512683935D00E31918 /* Main.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28332683935D00E31918 /* Main.js */; };
+		D86A28522683935D00E31918 /* Load.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28342683935D00E31918 /* Load.js */; };
+		D86A28532683935D00E31918 /* TokenMenu.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28352683935D00E31918 /* TokenMenu.js */; };
+		D86A28542683935D00E31918 /* PlayerPanel.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28362683935D00E31918 /* PlayerPanel.js */; };
+		D86A28552683935D00E31918 /* SceneData.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28372683935D00E31918 /* SceneData.js */; };
+		D86A28562683935D00E31918 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = D86A28382683935D00E31918 /* manifest.json */; };
+		D86A28572683935D00E31918 /* Jitsi.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A28392683935D00E31918 /* Jitsi.js */; };
+		D86A28582683935D00E31918 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = D86A283A2683935D00E31918 /* assets */; };
+		D86A28592683935D00E31918 /* CombatTracker.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A283B2683935D00E31918 /* CombatTracker.js */; };
+		D86A285A2683935D00E31918 /* color-picker.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A283C2683935D00E31918 /* color-picker.js */; };
+		D86A285B2683935D00E31918 /* color-picker.min.css in Resources */ = {isa = PBXBuildFile; fileRef = D86A283D2683935D00E31918 /* color-picker.min.css */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D86A280C2683935C00E31918 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D86A27F02683935B00E31918 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D86A28092683935C00E31918;
+			remoteInfo = "AboveVTT Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D86A281B2683935C00E31918 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D86A280B2683935C00E31918 /* AboveVTT Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		D86A27F82683935B00E31918 /* AboveVTT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AboveVTT.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D86A27FB2683935B00E31918 /* AboveVTT.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AboveVTT.entitlements; sourceTree = "<group>"; };
+		D86A27FC2683935B00E31918 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D86A27FF2683935B00E31918 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D86A28012683935B00E31918 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D86A28032683935C00E31918 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D86A28052683935C00E31918 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D86A280A2683935C00E31918 /* AboveVTT Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "AboveVTT Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D86A280F2683935C00E31918 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		D86A28122683935C00E31918 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		D86A28142683935C00E31918 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D86A28152683935C00E31918 /* AboveVTT_Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AboveVTT_Extension.entitlements; sourceTree = "<group>"; };
+		D86A28202683935D00E31918 /* purify.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = purify.min.js; path = Resources/purify.min.js; sourceTree = "<group>"; };
+		D86A28212683935D00E31918 /* abovevtt.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = abovevtt.css; path = Resources/abovevtt.css; sourceTree = "<group>"; };
+		D86A28222683935D00E31918 /* jquery.contextMenu.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = jquery.contextMenu.css; path = Resources/jquery.contextMenu.css; sourceTree = "<group>"; };
+		D86A28232683935D00E31918 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = icon.png; path = Resources/icon.png; sourceTree = "<group>"; };
+		D86A28242683935D00E31918 /* MonsterDice.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = MonsterDice.js; path = Resources/MonsterDice.js; sourceTree = "<group>"; };
+		D86A28252683935D00E31918 /* jquery.contextMenu.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = jquery.contextMenu.js; path = Resources/jquery.contextMenu.js; sourceTree = "<group>"; };
+		D86A28262683935D00E31918 /* Fog.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = Fog.js; path = Resources/Fog.js; sourceTree = "<group>"; };
+		D86A28272683935D00E31918 /* ScenesPanel.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = ScenesPanel.js; path = Resources/ScenesPanel.js; sourceTree = "<group>"; };
+		D86A28282683935D00E31918 /* MonsterPanel.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = MonsterPanel.js; path = Resources/MonsterPanel.js; sourceTree = "<group>"; };
+		D86A28292683935D00E31918 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; name = LICENSE; path = Resources/LICENSE; sourceTree = "<group>"; };
+		D86A282A2683935D00E31918 /* ScenesHandler.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = ScenesHandler.js; path = Resources/ScenesHandler.js; sourceTree = "<group>"; };
+		D86A282B2683935D00E31918 /* PrivacyPolicy.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = PrivacyPolicy.txt; path = Resources/PrivacyPolicy.txt; sourceTree = "<group>"; };
+		D86A282C2683935D00E31918 /* StatHandler.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = StatHandler.js; path = Resources/StatHandler.js; sourceTree = "<group>"; };
+		D86A282D2683935D00E31918 /* SoundPad.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = SoundPad.js; path = Resources/SoundPad.js; sourceTree = "<group>"; };
+		D86A282E2683935D00E31918 /* jquery.ui.touch-punch.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "jquery.ui.touch-punch.js"; path = "Resources/jquery.ui.touch-punch.js"; sourceTree = "<group>"; };
+		D86A282F2683935D00E31918 /* MessageBroker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = MessageBroker.js; path = Resources/MessageBroker.js; sourceTree = "<group>"; };
+		D86A28302683935D00E31918 /* Token.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = Token.js; path = Resources/Token.js; sourceTree = "<group>"; };
+		D86A28312683935D00E31918 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = Resources/README.md; sourceTree = "<group>"; };
+		D86A28322683935D00E31918 /* rpg-dice-roller.bundle.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "rpg-dice-roller.bundle.min.js"; path = "Resources/rpg-dice-roller.bundle.min.js"; sourceTree = "<group>"; };
+		D86A28332683935D00E31918 /* Main.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = Main.js; path = Resources/Main.js; sourceTree = "<group>"; };
+		D86A28342683935D00E31918 /* Load.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = Load.js; path = Resources/Load.js; sourceTree = "<group>"; };
+		D86A28352683935D00E31918 /* TokenMenu.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = TokenMenu.js; path = Resources/TokenMenu.js; sourceTree = "<group>"; };
+		D86A28362683935D00E31918 /* PlayerPanel.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = PlayerPanel.js; path = Resources/PlayerPanel.js; sourceTree = "<group>"; };
+		D86A28372683935D00E31918 /* SceneData.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = SceneData.js; path = Resources/SceneData.js; sourceTree = "<group>"; };
+		D86A28382683935D00E31918 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = Resources/manifest.json; sourceTree = "<group>"; };
+		D86A28392683935D00E31918 /* Jitsi.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = Jitsi.js; path = Resources/Jitsi.js; sourceTree = "<group>"; };
+		D86A283A2683935D00E31918 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = assets; path = Resources/assets; sourceTree = "<group>"; };
+		D86A283B2683935D00E31918 /* CombatTracker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = CombatTracker.js; path = Resources/CombatTracker.js; sourceTree = "<group>"; };
+		D86A283C2683935D00E31918 /* color-picker.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "color-picker.js"; path = "Resources/color-picker.js"; sourceTree = "<group>"; };
+		D86A283D2683935D00E31918 /* color-picker.min.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = "color-picker.min.css"; path = "Resources/color-picker.min.css"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D86A27F52683935B00E31918 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D86A28072683935C00E31918 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D86A28102683935C00E31918 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D86A27EF2683935B00E31918 = {
+			isa = PBXGroup;
+			children = (
+				D86A27FA2683935B00E31918 /* AboveVTT */,
+				D86A28112683935C00E31918 /* AboveVTT Extension */,
+				D86A280E2683935C00E31918 /* Frameworks */,
+				D86A27F92683935B00E31918 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D86A27F92683935B00E31918 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D86A27F82683935B00E31918 /* AboveVTT.app */,
+				D86A280A2683935C00E31918 /* AboveVTT Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D86A27FA2683935B00E31918 /* AboveVTT */ = {
+			isa = PBXGroup;
+			children = (
+				D86A27FB2683935B00E31918 /* AboveVTT.entitlements */,
+				D86A27FC2683935B00E31918 /* AppDelegate.swift */,
+				D86A27FE2683935B00E31918 /* Main.storyboard */,
+				D86A28012683935B00E31918 /* ViewController.swift */,
+				D86A28032683935C00E31918 /* Assets.xcassets */,
+				D86A28052683935C00E31918 /* Info.plist */,
+			);
+			path = AboveVTT;
+			sourceTree = "<group>";
+		};
+		D86A280E2683935C00E31918 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D86A280F2683935C00E31918 /* Cocoa.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		D86A28112683935C00E31918 /* AboveVTT Extension */ = {
+			isa = PBXGroup;
+			children = (
+				D86A281F2683935D00E31918 /* Resources */,
+				D86A28122683935C00E31918 /* SafariWebExtensionHandler.swift */,
+				D86A28142683935C00E31918 /* Info.plist */,
+				D86A28152683935C00E31918 /* AboveVTT_Extension.entitlements */,
+			);
+			path = "AboveVTT Extension";
+			sourceTree = "<group>";
+		};
+		D86A281F2683935D00E31918 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D86A28202683935D00E31918 /* purify.min.js */,
+				D86A28212683935D00E31918 /* abovevtt.css */,
+				D86A28222683935D00E31918 /* jquery.contextMenu.css */,
+				D86A28232683935D00E31918 /* icon.png */,
+				D86A28242683935D00E31918 /* MonsterDice.js */,
+				D86A28252683935D00E31918 /* jquery.contextMenu.js */,
+				D86A28262683935D00E31918 /* Fog.js */,
+				D86A28272683935D00E31918 /* ScenesPanel.js */,
+				D86A28282683935D00E31918 /* MonsterPanel.js */,
+				D86A28292683935D00E31918 /* LICENSE */,
+				D86A282A2683935D00E31918 /* ScenesHandler.js */,
+				D86A282B2683935D00E31918 /* PrivacyPolicy.txt */,
+				D86A282C2683935D00E31918 /* StatHandler.js */,
+				D86A282D2683935D00E31918 /* SoundPad.js */,
+				D86A282E2683935D00E31918 /* jquery.ui.touch-punch.js */,
+				D86A282F2683935D00E31918 /* MessageBroker.js */,
+				D86A28302683935D00E31918 /* Token.js */,
+				D86A28312683935D00E31918 /* README.md */,
+				D86A28322683935D00E31918 /* rpg-dice-roller.bundle.min.js */,
+				D86A28332683935D00E31918 /* Main.js */,
+				D86A28342683935D00E31918 /* Load.js */,
+				D86A28352683935D00E31918 /* TokenMenu.js */,
+				D86A28362683935D00E31918 /* PlayerPanel.js */,
+				D86A28372683935D00E31918 /* SceneData.js */,
+				D86A28382683935D00E31918 /* manifest.json */,
+				D86A28392683935D00E31918 /* Jitsi.js */,
+				D86A283A2683935D00E31918 /* assets */,
+				D86A283B2683935D00E31918 /* CombatTracker.js */,
+				D86A283C2683935D00E31918 /* color-picker.js */,
+				D86A283D2683935D00E31918 /* color-picker.min.css */,
+			);
+			name = Resources;
+			path = "AboveVTT Extension";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D86A27F72683935B00E31918 /* AboveVTT */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D86A281C2683935C00E31918 /* Build configuration list for PBXNativeTarget "AboveVTT" */;
+			buildPhases = (
+				D86A27F42683935B00E31918 /* Sources */,
+				D86A27F52683935B00E31918 /* Frameworks */,
+				D86A27F62683935B00E31918 /* Resources */,
+				D86A281B2683935C00E31918 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D86A280D2683935C00E31918 /* PBXTargetDependency */,
+			);
+			name = AboveVTT;
+			productName = AboveVTT;
+			productReference = D86A27F82683935B00E31918 /* AboveVTT.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D86A28092683935C00E31918 /* AboveVTT Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D86A28182683935C00E31918 /* Build configuration list for PBXNativeTarget "AboveVTT Extension" */;
+			buildPhases = (
+				D86A28062683935C00E31918 /* Sources */,
+				D86A28072683935C00E31918 /* Frameworks */,
+				D86A28082683935C00E31918 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "AboveVTT Extension";
+			productName = "AboveVTT Extension";
+			productReference = D86A280A2683935C00E31918 /* AboveVTT Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D86A27F02683935B00E31918 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1250;
+				LastUpgradeCheck = 1250;
+				TargetAttributes = {
+					D86A27F72683935B00E31918 = {
+						CreatedOnToolsVersion = 12.5.1;
+					};
+					D86A28092683935C00E31918 = {
+						CreatedOnToolsVersion = 12.5.1;
+					};
+				};
+			};
+			buildConfigurationList = D86A27F32683935B00E31918 /* Build configuration list for PBXProject "AboveVTT" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D86A27EF2683935B00E31918;
+			productRefGroup = D86A27F92683935B00E31918 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D86A27F72683935B00E31918 /* AboveVTT */,
+				D86A28092683935C00E31918 /* AboveVTT Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D86A27F62683935B00E31918 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D86A28042683935C00E31918 /* Assets.xcassets in Resources */,
+				D86A28002683935B00E31918 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D86A28082683935C00E31918 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D86A28432683935D00E31918 /* jquery.contextMenu.js in Resources */,
+				D86A285A2683935D00E31918 /* color-picker.js in Resources */,
+				D86A28592683935D00E31918 /* CombatTracker.js in Resources */,
+				D86A28532683935D00E31918 /* TokenMenu.js in Resources */,
+				D86A284A2683935D00E31918 /* StatHandler.js in Resources */,
+				D86A28442683935D00E31918 /* Fog.js in Resources */,
+				D86A28452683935D00E31918 /* ScenesPanel.js in Resources */,
+				D86A28412683935D00E31918 /* icon.png in Resources */,
+				D86A284D2683935D00E31918 /* MessageBroker.js in Resources */,
+				D86A28522683935D00E31918 /* Load.js in Resources */,
+				D86A284F2683935D00E31918 /* README.md in Resources */,
+				D86A28542683935D00E31918 /* PlayerPanel.js in Resources */,
+				D86A28512683935D00E31918 /* Main.js in Resources */,
+				D86A28472683935D00E31918 /* LICENSE in Resources */,
+				D86A28582683935D00E31918 /* assets in Resources */,
+				D86A285B2683935D00E31918 /* color-picker.min.css in Resources */,
+				D86A283F2683935D00E31918 /* abovevtt.css in Resources */,
+				D86A283E2683935D00E31918 /* purify.min.js in Resources */,
+				D86A28402683935D00E31918 /* jquery.contextMenu.css in Resources */,
+				D86A28482683935D00E31918 /* ScenesHandler.js in Resources */,
+				D86A28572683935D00E31918 /* Jitsi.js in Resources */,
+				D86A284E2683935D00E31918 /* Token.js in Resources */,
+				D86A28492683935D00E31918 /* PrivacyPolicy.txt in Resources */,
+				D86A28422683935D00E31918 /* MonsterDice.js in Resources */,
+				D86A28502683935D00E31918 /* rpg-dice-roller.bundle.min.js in Resources */,
+				D86A284B2683935D00E31918 /* SoundPad.js in Resources */,
+				D86A284C2683935D00E31918 /* jquery.ui.touch-punch.js in Resources */,
+				D86A28562683935D00E31918 /* manifest.json in Resources */,
+				D86A28462683935D00E31918 /* MonsterPanel.js in Resources */,
+				D86A28552683935D00E31918 /* SceneData.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D86A27F42683935B00E31918 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D86A28022683935B00E31918 /* ViewController.swift in Sources */,
+				D86A27FD2683935B00E31918 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D86A28062683935C00E31918 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D86A28132683935C00E31918 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D86A280D2683935C00E31918 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D86A28092683935C00E31918 /* AboveVTT Extension */;
+			targetProxy = D86A280C2683935C00E31918 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D86A27FE2683935B00E31918 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D86A27FF2683935B00E31918 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D86A28162683935C00E31918 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D86A28172683935C00E31918 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 11.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+			};
+			name = Release;
+		};
+		D86A28192683935C00E31918 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "AboveVTT Extension/AboveVTT_Extension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "AboveVTT Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D86A281A2683935C00E31918 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "AboveVTT Extension/AboveVTT_Extension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = "AboveVTT Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT.Extension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		D86A281D2683935C00E31918 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AboveVTT/AboveVTT.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = AboveVTT/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D86A281E2683935C00E31918 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = AboveVTT/AboveVTT.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = AboveVTT/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D86A27F32683935B00E31918 /* Build configuration list for PBXProject "AboveVTT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D86A28162683935C00E31918 /* Debug */,
+				D86A28172683935C00E31918 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D86A28182683935C00E31918 /* Build configuration list for PBXNativeTarget "AboveVTT Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D86A28192683935C00E31918 /* Debug */,
+				D86A281A2683935C00E31918 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D86A281C2683935C00E31918 /* Build configuration list for PBXNativeTarget "AboveVTT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D86A281D2683935C00E31918 /* Debug */,
+				D86A281E2683935C00E31918 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D86A27F02683935B00E31918 /* Project object */;
+}
