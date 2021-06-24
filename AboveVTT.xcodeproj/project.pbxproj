@@ -44,6 +44,7 @@
 		D86A28592683935D00E31918 /* CombatTracker.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A283B2683935D00E31918 /* CombatTracker.js */; };
 		D86A285A2683935D00E31918 /* color-picker.js in Resources */ = {isa = PBXBuildFile; fileRef = D86A283C2683935D00E31918 /* color-picker.js */; };
 		D86A285B2683935D00E31918 /* color-picker.min.css in Resources */ = {isa = PBXBuildFile; fileRef = D86A283D2683935D00E31918 /* color-picker.min.css */; };
+		D87E080E2684AA04003147DD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D86A28032683935C00E31918 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -337,6 +338,7 @@
 				D86A284E2683935D00E31918 /* Token.js in Resources */,
 				D86A28492683935D00E31918 /* PrivacyPolicy.txt in Resources */,
 				D86A28422683935D00E31918 /* MonsterDice.js in Resources */,
+				D87E080E2684AA04003147DD /* Assets.xcassets in Resources */,
 				D86A28502683935D00E31918 /* rpg-dice-roller.bundle.min.js in Resources */,
 				D86A284B2683935D00E31918 /* SoundPad.js in Resources */,
 				D86A284C2683935D00E31918 /* jquery.ui.touch-punch.js in Resources */,
@@ -506,6 +508,7 @@
 		D86A28192683935C00E31918 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "AboveVTT Extension/AboveVTT_Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "AboveVTT Extension/Info.plist";
@@ -515,6 +518,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = .51;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT.Extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -525,6 +529,7 @@
 		D86A281A2683935C00E31918 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "AboveVTT Extension/AboveVTT_Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				INFOPLIST_FILE = "AboveVTT Extension/Info.plist";
@@ -534,6 +539,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = .51;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT.Extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -558,6 +564,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = .51;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -581,6 +588,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = .51;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
