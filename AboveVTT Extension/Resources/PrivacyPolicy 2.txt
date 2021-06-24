@@ -1,0 +1,7 @@
+==== AboveVTT Privacy Policy ====
+
+AboveVTT does not collect,analyze or store any of your personal data in any way.
+
+AboveVTT works just by interacting with the DnDBeyond.com webiste.
+
+AboveVTT use Google Analytics only to track the number of users.
