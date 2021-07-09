@@ -58,8 +58,17 @@ body > button:hover,
 }
 
 .drawbutton.button-enabled {
-    background-image: none !important;
-    background: red !important;
+    background-image: -webkit-linear-gradient(270deg, #f7a6a6, #ff7777);
+    box-shadow: 0 0 12px 0px #f10000;
+    border: #ff7777;
+}
+
+.drawbutton.button-enabled:hover {
+    background-image: -webkit-linear-gradient(270deg, #e29393, #f37a7a);
+}
+
+.top_menu .drawbutton.button-enabled {
+    box-shadow: none;
 }
 
 .top_menu {
@@ -377,7 +386,7 @@ div#scene_properties form > div {
 
 #patreons {
 	padding-top:20px;
-    font-size: 10px;
+    font-size: 9px;
  
    -webkit-column-count: 4;
       -moz-column-count: 4;
@@ -825,6 +834,22 @@ div#scene_properties form > div {
 
 .context-menu-input.on-off-title > label > input[type="checkbox"] {
     float: right;
+}
+
+.context-menu-input.hp-context-input{
+    display: inline-block;
+    zoom: 1;
+    max-width: 75px;
+}
+
+.context-menu-input.hp-context-input > label > input{
+    width: 100%;
+}
+
+.context-menu-helptext {
+    max-width: 150px;
+    color: grey;
+    font-size: 0.9em;
 }
 
 .token-round{
