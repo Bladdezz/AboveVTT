@@ -516,6 +516,7 @@
 				CODE_SIGN_ENTITLEMENTS = "AboveVTT Extension/AboveVTT_Extension.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = T6NVJBXQQ6;
 				INFOPLIST_FILE = "AboveVTT Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -524,7 +525,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = .51;
+				MARKETING_VERSION = 0.0.51;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT.Extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -539,6 +540,7 @@
 				CODE_SIGN_ENTITLEMENTS = "AboveVTT Extension/AboveVTT_Extension.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = T6NVJBXQQ6;
 				INFOPLIST_FILE = "AboveVTT Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -547,7 +549,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = .51;
+				MARKETING_VERSION = 0.0.51;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT.Extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -565,6 +567,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = T6NVJBXQQ6;
 				INFOPLIST_FILE = AboveVTT/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -572,7 +575,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = .51;
+				MARKETING_VERSION = 0.0.51;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -589,6 +592,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = T6NVJBXQQ6;
 				INFOPLIST_FILE = AboveVTT/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -596,7 +600,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MARKETING_VERSION = .51;
+				MARKETING_VERSION = 0.0.51;
 				PRODUCT_BUNDLE_IDENTIFIER = com.bladenet.AboveVTT;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
