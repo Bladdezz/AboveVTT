@@ -1,5 +1,63 @@
-class MessageBroker {
+// this shouln't be here...
 
+function mydebounce(func, timeout = 800){
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => { func.apply(this, args); }, timeout);
+  };
+}
+
+function clearFrame(){
+	let canvas=$("#dicecanvas").get(0);
+	let ctx=canvas.getContext('2d');
+	ctx.clearRect(0,0,canvas.width,canvas.height);
+}
+
+const delayedClear = mydebounce(() => clearFrame());
+
+function addVideo(stream) {
+	let video = document.createElement("video");
+	video.setAttribute("class", "dicestream");
+	video.width = 1024;
+	video.height = 600;
+	video.autoplay = true;
+	$(video).hide();
+	video.srcObject = stream;
+	document.body.appendChild(video);
+	video.play();
+	
+	let canvas=$("#dicecanvas").get(0);
+	let ctx=canvas.getContext('2d');
+	let updateCanvas=function(){
+		delayedClear();
+		
+		
+		let tmpcanvas = document.createElement("canvas");
+		tmpcanvas.width = 1024;
+		tmpcanvas.height = 600;
+		let tmpctx = tmpcanvas.getContext("2d");
+		tmpctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, 1024, 600);
+		const frame = tmpctx.getImageData(0, 0, 1024, 600);
+
+		for (let i = 0; i < frame.data.length; i += 4) {
+			const red = frame.data[i + 0];
+			const green = frame.data[i + 1];
+			const blue = frame.data[i + 2];
+			if ((red < 24) && (green < 24) && (blue < 24))
+				frame.data[i + 3] = 128;
+			if ((red < 8) && (green < 8) && (blue < 8))
+				frame.data[i + 3] = 0;
+			
+		}
+		ctx.putImageData(frame,0,0);
+		video.requestVideoFrameCallback(updateCanvas);
+	};
+	
+	video.requestVideoFrameCallback(updateCanvas);
+}
+
+class MessageBroker {
 
 
 	loadWS(token, callback = null) {
@@ -51,6 +109,8 @@ class MessageBroker {
 				return;
 
 			var msg = $.parseJSON(event.data);
+			console.log(msg.eventType);
+			
 			if (msg.eventType == "custom/myVTT/token") {
 				self.handleToken(msg);
 			}
@@ -69,8 +129,11 @@ class MessageBroker {
 				window.DRAWINGS.push(msg.data);
 				redraw_drawings();
 			}
-			if (msg.eventType == "custom/myVTT/chat") {
-				self.handleChat(msg.data);
+			if (msg.eventType == "custom/myVTT/chat") { // DEPRECATED!!!!!!!!!
+				if(!window.NOTIFIEDOLDVERSION){
+					alert('One of the player is using AboveTT 0.0.51 or less. Please update everyone to 0.0.52 or higher');
+					window.NOTIFIEDOLDVERSION=true;
+				}
 			}
 			if (msg.eventType == "custom/myVTT/CT" && (!window.DM)) {
 				self.handleCT(msg.data);
@@ -142,11 +205,129 @@ class MessageBroker {
 			if (msg.eventType == "custom/myVTT/playerdata") {
 				self.handlePlayerData(msg.data);
 			}
+			if (msg.eventType == "dice/roll/pending"){
+				// check for injected_data!
+				if(msg.data.injected_data){
+					notify_gamelog();
+					self.handle_injected_data(msg);
+				}
+			}
+			
+			if(msg.eventType== "custom/myVTT/iceforyourgintonic"){
+				if( !window.JOINTHEDICESTREAM)
+					return;
+				if( (!window.MYSTREAMID)  || (msg.data.to!= window.MYSTREAMID) )
+					return;
+					
+				setTimeout( () => {
+				var peer=window.STREAMPEERS[msg.data.from];
+				peer.addIceCandidate(msg.data.ice);
+				 },500); // ritardalo un po'
+			}
+			if(msg.eventType == "custom/myVTT/wannaseemydicecollection"){
+				if( !window.JOINTHEDICESTREAM)
+					return;
+				if( (!window.MYSTREAMID))
+					return;
+				const configuration = {
+    				iceServers: [{urls: "turn:turn.abovevtt.net:3478",username:"abovevtt",credential:"pleasedontfuckitupthisisanopenproject"}]
+  				};
+				var peer=new RTCPeerConnection(configuration);
+				peer.addEventListener('track', async (event) => {
+					console.log("aggiungo video!!!!");
+				     addVideo(event.streams[0]);
+				});
+				peer.onicecandidate = e => {
+					window.MB.sendMessage("custom/myVTT/iceforyourgintonic",{
+						to: msg.data.from,
+						from: window.MYSTREAMID,
+						ice: e.candidate
+					})
+				};
+
+				
+				window.STREAMPEERS[msg.data.from]=peer;
+				peer.onconnectionstatechange=() => {
+					if((peer.connectionState=="closed") || (peer.connectionState=="failed")){
+						console.log("DELETING PEER "+msg.data.from);
+						delete window.STREAMPEERS[msg.data.from];
+					}
+				};
+				if(window.MYMEDIASTREAM){
+					var stream=window.MYMEDIASTREAM;
+					stream.getTracks().forEach(track => peer.addTrack(track, stream));
+				}
+				peer.createOffer({offerToReceiveVideo: 1}).then( (desc) => {
+					console.log("fatto setLocalDescription");
+					peer.setLocalDescription(desc);
+					self.sendMessage("custom/myVTT/okletmeseeyourdice",{
+						to: msg.data.from,
+						from: window.MYSTREAMID,
+						offer: desc
+					})
+				});
+			}
+			if(msg.eventType == "custom/myVTT/okletmeseeyourdice"){
+				if( !window.JOINTHEDICESTREAM)
+					return;
+				if( (!window.MYSTREAMID)  || (msg.data.to!= window.MYSTREAMID) )
+					return;
+				const configuration = {
+    				iceServers: [{urls: "turn:turn.abovevtt.net:3478",username:"abovevtt",credential:"pleasedontfuckitupthisisanopenproject"}]
+  				};
+				var peer=new RTCPeerConnection(configuration);
+				peer.addEventListener('track', async (event) => {
+					addVideo(event.streams[0]);
+				});
+				peer.onicecandidate = e => {
+					window.MB.sendMessage("custom/myVTT/iceforyourgintonic",{
+						to: msg.data.from,
+						from: window.MYSTREAMID,
+						ice: e.candidate
+					})
+				};
+				
+				window.STREAMPEERS[msg.data.from]=peer;
+				peer.onconnectionstatechange=() => {
+					if((peer.connectionState=="closed") || (peer.connectionState=="failed")){
+						console.log("DELETING PEER "+msg.data.from);
+						delete window.STREAMPEERS[msg.data.from];
+					}
+				};
+				if(window.MYMEDIASTREAM){
+					var stream=window.MYMEDIASTREAM;
+					stream.getTracks().forEach(track => peer.addTrack(track, stream));
+				}
+				peer.setRemoteDescription(msg.data.offer);
+				console.log("fatto setRemoteDescription");
+				peer.createAnswer().then( (desc) => {
+					peer.setLocalDescription(desc);
+					console.log("fatto setLocalDescription");
+					
+					window.MB.sendMessage("custom/myVTT/okseethem",{
+						from: window.MYSTREAMID,
+						to: msg.data.from,
+						answer: desc
+					});
+				})
+			}
+			if(msg.eventType == "custom/myVTT/okseethem"){
+				if( !window.JOINTHEDICESTREAM)
+					return;
+				if( (!window.MYSTREAMID)  || (msg.data.to!= window.MYSTREAMID) )
+					return;
+				var peer=window.STREAMPEERS[msg.data.from];
+				peer.setRemoteDescription(msg.data.answer);
+				console.log("fatto setRemoteDescription");
+			}
+			
 			if (msg.eventType == "dice/roll/fulfilled") {
 				notify_gamelog();
-				if (!window.DM)
+								if (!window.DM)
 					return;
-				// CHECK FOR INIT ROLLS
+				
+					
+				// CHECK FOR INIT ROLLS (auto add to combat tracker)
 				if (msg.data.action == "Initiative") {
 					console.log(msg.data);
 					var total = msg.data.rolls[0].result.total;
@@ -177,8 +358,73 @@ class MessageBroker {
 		};
 	}
 
+	handle_injected_data(data){
+		let self=this;
+		self.chat_pending_messages.push(data);
+		// start the task
+		
+		if(self.chat_decipher_task==null){
+			self.chat_decipher_task=setInterval(function(){
+				console.log("deciphering");
+				for(var i=0;i<self.chat_pending_messages.length;i++){
+					var current=self.chat_pending_messages.shift();
+					
+					var injection_id=current.data.rolls[0].rollType;
+					var injection_data=current.data.injected_data;
+					console.log(injection_id);
+					console.log(injection_data);
+					
+					var found=false;
+					$(".DiceMessage_RollType__wlBsW").each(function(){
+						if($(this).text()==injection_id){
+							console.log("TROVATOOOOOOOOOOOOOOOOO");
+							found=true;
+							let li =$(this).closest("li");
+							let oldheight=li.height();
+							var newlihtml=self.convertChat(injection_data).html();
+							if(newlihtml=="")
+								li.css("display","none"); // THIS IS TO HIDE DMONLY STUFF
+								
+							li.animate({ opacity: 0 }, 250, function() {
+								li.html(newlihtml);
+								let neweight = li.height();
+								li.height(oldheight);
+								li.animate({ opacity: 1, height: neweight }, 250, () => { li.height("") });
+
+								if (injection_data.dmonly && window.DM) { // ADD THE "Send To Player Buttons"
+									let btn = $("<button>Show to Players</button>")
+									li.append(btn);
+									btn.click(() => {
+										li.css("display", "none");
+										delete injection_data.dmonly;
+										self.inject_chat(injection_data); // RESEND THE MESSAGE REMOVING THE "injection only"
+									});
+								}
+							});
+							
+							
+						}
+					});
+					if(!found){
+						self.chat_pending_messages.push(current);
+					}
+				}
+				if(self.chat_pending_messages.length==0){
+					console.log("stop deciphering");
+					clearInterval(self.chat_decipher_task);
+					self.chat_decipher_task=null;
+				}
+			},500);
+		}
+	}
+
 	constructor() {
 		var self = this;
+		
+		this.chat_id=uuid();
+		this.chat_counter=0;
+		this.chat_pending_messages=[];
+		this.chat_decipher_task=null;
 
 		this.callbackQueue = [];
 
@@ -220,8 +466,7 @@ class MessageBroker {
 					text: "<b>Check for concentration!!</b>",
 				};
 
-				window.MB.sendMessage('custom/myVTT/chat', msgdata);
-				window.MB.handleChat(msgdata);
+				window.MB.inject_chat(msgdata);
 			}
 			cur.options.hp = data.hp;
 
@@ -238,17 +483,18 @@ class MessageBroker {
 
 		update_pclist();
 	}
-
-	handleChat(data,local=false) {
+	
+	convertChat(data,local=false) {
 		//Security logic to prevent content being sent which can execute JavaScript.
 		data.player = DOMPurify.sanitize( data.player,{ALLOWED_TAGS: []});
 		data.img = DOMPurify.sanitize( data.img,{ALLOWED_TAGS: []});
 		data.text = DOMPurify.sanitize( data.text,{ALLOWED_TAGS: ['img','div','p', 'b', 'button', 'span', 'style', 'path', 'svg']}); //This array needs to include all HTML elements the extension sends via chat.
 
 		if(data.dmonly && !(window.DM) && !local) // /dmroll only for DM of or the user who initiated it
-			return;
-		notify_gamelog();
-		var newentry = $(`<li ${data.id ? `id="${data.id}"` : ""}></li>`);
+			return $("<div/>");
+		//notify_gamelog();
+		
+		var newentry = $("<div/>");
 		newentry.attr('class', 'GameLogEntry_GameLogEntry__2EMUj GameLogEntry_Other__1rv5g Flex_Flex__3cwBI Flex_Flex__alignItems-flex-end__bJZS_ Flex_Flex__justifyContent-flex-start__378sw');
 		newentry.append($("<p role='img' class='Avatar_Avatar__131Mw Flex_Flex__3cwBI'><img class='Avatar_AvatarPortrait__3cq6B' src='" + data.img + "'></p>"));
 		var container = $("<div class='GameLogEntry_MessageContainer__RhcYB Flex_Flex__3cwBI Flex_Flex__alignItems-flex-start__HK9_w Flex_Flex__flexDirection-column__sAcwk'></div>");
@@ -263,8 +509,10 @@ class MessageBroker {
 
 		newentry.append(container);
 
-		$(".GameLog_GameLogEntries__3oNPD").prepend(newentry);
+		return newentry;
+		//$(".GameLog_GameLogEntries__3oNPD").prepend(newentry);
 	}
+
 
 	handleToken(msg) {
 		var data = msg.data;
@@ -386,6 +634,58 @@ class MessageBroker {
 			}
 		}
 	}
+	
+	inject_chat(injected_data) {
+		var msgid = this.chat_id + this.chat_counter++;
+
+		var data = {
+			injected_data: injected_data,
+			"action": "ABOVETT",
+			"rolls": [
+				{
+					"diceNotation": {
+						"set": [
+						],
+						"constant": 0
+					},
+					"diceNotationStr": "1d4",
+					"rollType": msgid,
+					"rollKind": "",
+				}
+			],
+			"context": {
+				"entityId": this.userid,
+				"entityType": "user",
+				"messageScope": "gameId",
+				"messageTarget": this.gameid
+			},
+			"setId": "01201",
+			"rollId": uuid(),
+		};
+		var eventType = "dice/roll/pending";
+		var message = {
+			id: uuid(),
+			source: "web",
+			gameId: this.gameid,
+			userId: this.userid,
+			persist: false, // INTERESSANTE PER RILEGGERLI, per ora non facciamogli casini
+			messageScope: "gameId",
+			messageTarget: this.gameid,
+			eventType: eventType,
+			data: data,
+			entityId: this.userid, //proviamo a non metterla
+			entityType: "user", // MOLTO INTERESSANTE. PENSO VENGA USATO PER CAPIRE CHE IMMAGINE METTERCI.
+		};
+
+		if (this.ws.readyState == this.ws.OPEN) {
+			this.ws.send(JSON.stringify(message));
+		}
+		
+		this.handle_injected_data(message);
+
+
+	}
+
 
 	sendMessage(eventType, data) {
 		var self = this;

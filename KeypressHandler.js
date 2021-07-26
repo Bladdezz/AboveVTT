@@ -1,3 +1,7 @@
+
+function init_keypress_handler(){
+	
+	
 var altHeld, ctrlHeld, savedSnapState;
 
 Mousetrap.bind('c', function () {       //combat tracker
@@ -47,7 +51,8 @@ Mousetrap.bind('-', function () {       //zoom minus
     $('#zoom_minus').click()
 });
 
-Mousetrap.bind('tab', function () {     //collapse/show character sheet
+Mousetrap.bind('space', function (e) {     //collapse/show character sheet
+	e.preventDefault();
     if(!window.DM) {    
         $('#sheet_button').click()
     }
@@ -177,3 +182,10 @@ Mousetrap.bind('ctrl', function () {
     window.CURRENT_SCENE_DATA.snap = (window.CURRENT_SCENE_DATA.snap == 0 ? 1 : 0);
     ctrlHeld = false;
 }, 'keyup');
+
+Mousetrap.bind('shift+h', function () {
+    $('#scene_selector_toggle, #combat_button, #measure-button, #fog_button, #draw_button, #select-button, #zoom_buttons, #hide_rightpanel').toggle();
+    $("button:contains('CONNECT VIDEO')").toggle();
+});
+
+}

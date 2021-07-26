@@ -1,3 +1,4 @@
+
 function parse_img(url){
 	retval=url;
 	if(retval.startsWith("https://drive.google.com") && retval.indexOf("uc?id=") < 0)
@@ -59,7 +60,6 @@ function change_zoom(newZoom, x, y) {
 	$("#VTTWRAPPER").height($("#scene_map").height() * window.ZOOM + 1400);
 	$("#black_layer").width($("#scene_map").width() * window.ZOOM + 1400);
 	$("#black_layer").height($("#scene_map").height() * window.ZOOM + 1400)
-
 	$(window).scrollLeft(pageX);
 	$(window).scrollTop(pageY);
 }
@@ -293,8 +293,7 @@ function load_monster_stat(monsterid) {
 						text: "<img width='100%' src='" + imgsrc + "'>",
 					};
 
-					window.MB.sendMessage('custom/myVTT/chat', msgdata);
-					window.MB.handleChat(msgdata);
+					window.MB.inject_chat(msgdata);
 				});
 			}
 
@@ -438,7 +437,7 @@ function init_splash() {
 	cont.css('z-index', 999);
 	cont.css('border', '3px solid black');
 
-	cont.append("<h1 style='padding-bottom:2px;margin-bottom:2px; text-align:center'><img width='250px' src='" + window.EXTENSION_PATH + "assets/logo.png'><div style='margin-left:20px; display:inline;vertical-align:bottom;'>0.0.51</div></h1>");
+	cont.append("<h1 style='padding-bottom:2px;margin-bottom:2px; text-align:center'><img width='250px' src='" + window.EXTENSION_PATH + "assets/logo.png'><div style='margin-left:20px; display:inline;vertical-align:bottom;'>0.52RC1</div></h1>");
 	cont.append("<div style='font-style: italic;padding-left:80px;font-size:20px;margin-bottom:10px;margin-top:2px; margin-left:50px;'>Fine.. I'll do it myself..</div>");
 	
 	s=$("<div/>");
@@ -481,15 +480,15 @@ function init_splash() {
 	ul.append("<li><a style='font-weight:bold;text-decoration: underline;' target='_blank' href='https://www.patreon.com/AboveVTT'>Patreon</a></li>");
 	cont.append(ul);*/
 	cont.append("Author, owner and technowizard: <b>Daniele <i>cyruzzo</i> Martini</b><br>Community & Collaborations Manager: <b>SnailDice (Nadav)</b>");
-	cont.append("<br>Contributors: <b>Stumpy, Palad1N, KuzKuz, Coryphon, Johnno, Hypergig, JoshBrodieNZ, Kudolpf</b>");
+	cont.append("<br>Contributors: <b>Stumpy, Palad1N, KuzKuz, Coryphon, Johnno, Hypergig, JoshBrodieNZ, Kudolpf, Koals</b>");
 	cont.append("<h3>Patreon Supporters</h3>");
 	cont.append("AboveVTT is not financed by any company. It started as a hobby project and I'm dedicating a lot of my time to it. It's totally opensource and there won't be any paid version. If you like it, and want to see it grow, please consider supporting me on <a style='font-weight:bold;text-decoration: underline;' target='_blank' href='https://www.patreon.com/AboveVTT'>Patreon</a>");
 
 	patreons = $("<div id='patreons' style='margin-top:9x;'/>");
 
-	l1 = ["Max Puplett", "Kevin Morgan", "Clipped Dragon", "Miguel  Garcia Jr.", "Jeff Antis","ZorkFox"];
-	l2 = ["Iain Russell", "Lukas Edelmann", "Oliver", "Jordan Innerarity", "Chad Lenny", "Phillip Geurtz", "Virginia Lancianese", "Daniel Levitus", "RenoGeek", "TheDigifire", "Ryan Purcell", "adam williams", "Chance Russo", "Kris Scott", "Steve Carsella", "Brendan Shane", "Reginald Coupet", "Pucas McDookie", "Jordan Cohen", "Chris Johnson", "Michael Saint Gregory", "Elmer Senson", "Chris Cannon","David William Daniel Thomas","Tom","CritCat (ExpQuest)","Carl Cedarstaff II","Renato Villas Boas Medeiros"];
-	l3 = ["Daniel Wall", "Jerome Van Vynckt", "Cameron Warner", "Luis Mirandela", "Martin Brandt", "Julia Hoffmann", "Amata (she_her)", "Alexander Engel", "Fini Plays", "Tommy Girouard-Belhumeur", "nate gonzalez", "Jason Osterbind", "Daniel Villablanca", "William Geisbert", "Adam Nothnagel", "Kat", "Cobalt Blue", "Danny Pellerin", "Cody Vegas Rothwell", "damian tier", "CraftyHobo", "CrazyPitesh", "Milkmann", "aaron hamilton", "Eduardo Villela", "Paul Maloney", "David Meese","Adam Connor","mad4ever","Brad Stack","Johan Surac","Chris Sells","Tim Newton","Nick champion","Aviad Tal","Brahm","Randy Zuendel","M Mustaqim Mustafa","Robert J Correa","Jon Bond","Philip Wert"];
+	l1 = ["Max Puplett", "Clipped Dragon", "Miguel  Garcia Jr.","Epyk","ZorkFox","Imaginary Voices"];
+	l2 = ["Iain Russell", "Lukas Edelmann", "Oliver", "Jordan Innerarity", "Chad Lenny", "Phillip Geurtz", "Virginia Lancianese", "Daniel Levitus", "RenoGeek", "TheDigifire", "Ryan Purcell", "adam williams", "Chance Russo", "Kris Scott", "Steve Carsella", "Brendan Shane", "Reginald Coupet", "Pucas McDookie", "Jordan Cohen", "Chris Johnson", "Elmer Senson", "Chris Cannon","David William Daniel Thomas","Tom","CritCat (ExpQuest)","Carl Cedarstaff II","Renato Villas Boas Medeiros","Kim Dargeou"];
+	l3 = ["Daniel Wall", "Cameron Warner", "Luis Mirandela", "Martin Brandt", "Julia Hoffmann", "Amata (she_her)", "Alexander Engel", "Fini Plays", "Tommy Girouard-Belhumeur", "nate gonzalez", "Jason Osterbind", "Daniel Villablanca", "William Geisbert", "Adam Nothnagel", "Kat", "Cobalt Blue", "Danny Pellerin", "Cody Vegas Rothwell", "damian tier", "CraftyHobo", "CrazyPitesh", "Milkmann", "aaron hamilton", "Eduardo Villela", "Paul Maloney", "David Meese","Adam Connor","mad4ever","Brad Stack","Johan Surac","Chris Sells","Tim Newton","Nick champion","Aviad Tal","Brahm","Randy Zuendel","M Mustaqim Mustafa","Robert J Correa","Jon Bond","Cistern","Liam Burke","James Cohen","Deku Baba","its Bonez","BelowtheDM","Unlucky Archer","Michael Crane","Han Dandler"];
 
 	l1div = $("<div class='patreons-title'>Masters of the Realms</div>");
 	l1ul = $("<ul/>");
@@ -526,64 +525,6 @@ function init_splash() {
 
 
 }
-
-
-function sortGameLog(e) {
-	/*if(Math.abs(Math.abs($(".GameLog_GameLog__2z_HZ").scrollTop()) -  $(".GameLog_GameLog__2z_HZ").prop("scrollHeight")) < 500 ){
-		return;	 // DO NOT SORT WHEN AT THE TOP
-	} */
-
-	var prescroll = $(".GameLog_GameLog__2z_HZ").scrollTop();
-	$(".GameLog_GameLog__2z_HZ").scrollTop(0);
-	console.log($(".GameLog_GameLog__2z_HZ").prop("scrollHeight") + "--- " + Math.abs($(".GameLog_GameLog__2z_HZ").scrollTop()));
-	$(".GameLog_GameLogEntries__3oNPD").off('DOMNodeInserted', sortGameLog);
-	try {		
-		
-		var items = $(".GameLog_GameLogEntries__3oNPD").children().sort(
-			function(a, b) {
-				var vA = Date.parse($("time", a).attr('datetime'));
-				var vB = Date.parse($("time", b).attr('datetime'));
-				return (vA > vB) ? -1 : (vA < vB) ? 1 : 0;
-			});
-		$(".GameLog_GameLogEntries__3oNPD").append(items);
-
-		// SHOW ELEMENT IF GAMELOG IS HIDDEN
-		cloned_entry = $($(e.target).clone(true));
-		if ($("#hide_rightpanel").attr('data-visible') === "0" && (cloned_entry.find(".DiceMessage_Pending__30N8v").length == 0) && !cloned_entry.is("svg")) {
-			cloned_entry.css("border-radius", "10px 10px 10px 10px");
-			cloned_entry.css("border", "2px solid black");
-			cloned_entry.css("background", "rgba(255,255,255,0.95)");
-			console.log(cloned_entry);
-
-			if ($("#temporary_gamelog").length == 0) {
-				var t = $("<ul id='temporary_gamelog'/>");
-				t.css("position", "fixed");
-				t.css("bottom", "0px");
-				t.css("right", "0px");
-				t.css("width", "340px");
-				//t.css("background","rgba(255,255,255,0.95)");
-				$("body").append(t);
-			}
-
-			$("#temporary_gamelog").append(cloned_entry);
-
-
-			cloned_entry.delay(10000).animate({ opacity: 0 }, 4000, function() {
-				$(this).remove();
-				if ($("#temporary_gamelog").children().length == 0)
-					$("#temporary_gamelog").remove();
-			})
-		}
-
-		$(".GameLog_GameLog__2z_HZ").scrollTop(prescroll);
-	}
-	catch (error) {
-		console.log(error);
-	}
-	$(".GameLog_GameLogEntries__3oNPD").on('DOMNodeInserted', sortGameLog);
-}
-
-
 
 // UNIFIED TOKEN HANDLING
 var MYCOBALT_TOKEN = false;
@@ -709,6 +650,17 @@ function open_player_sheet(sheet_url) {
 		$(event.target).contents().find(".homebrew-comments").remove();
 
 		
+		// DICE STREAMING ?!?!
+		if(!window.DM){
+			window.MYMEDIASTREAM=$(event.target).contents().find(".dice-rolling-panel__container").get(0).captureStream();
+			if(window.JOINTHEDICESTREAM){
+				// we should tear down and reconnect
+				for(let i in window.STREAMPEERS){
+					console.log("replacing the track")
+					window.STREAMPEERS[i].getSenders()[0].replaceTrack(window.MYMEDIASTREAM.getVideoTracks()[0]);
+				}
+			}
+		}
 
 		// CHARACTER
 		let tokenid = sheet_url;
@@ -849,8 +801,7 @@ function open_player_sheet(sheet_url) {
 							img: window.PLAYER_IMG,
 							text: html
 						};
-						window.MB.sendMessage('custom/myVTT/chat', data);
-						window.MB.handleChat(data);
+						window.MB.inject_chat(data);
 
 
 					});
@@ -905,6 +856,12 @@ function open_player_sheet(sheet_url) {
 			}
 			//container.height($(".sidebar__inner").height());
 			container.height($(".sidebar__inner").height() - 20);
+			
+			if(window.JOINTHEDICESTREAM){
+				iframe.contents().find(".dice-rolling-panel__container").get(0).height=600;
+				iframe.contents().find(".dice-rolling-panel__container").height(600);
+			}
+			
 			iframe.height(container.height() - 20);
 
 			container.css("z-index", 99999999);
@@ -943,11 +900,9 @@ function init_ui() {
 	// ATTIVA GAMELOG
 	$(".gamelog-button").click();
 	$(".glc-game-log").addClass("sidepanel-content");
-	$(".sidebar").zIndex(99999);
+	$(".sidebar").zIndex(9999);
 	$("#site").children().hide();
 	$(".sidebar__controls").width(340);
-
-	$(".GameLog_GameLogEntries__3oNPD").on('DOMNodeInserted', sortGameLog);
 
 
 	// AGGIUNGI CHAT
@@ -1028,18 +983,17 @@ function init_ui() {
 		const data = {
 			player: window.PLAYER_NAME,
 			img: window.PLAYER_IMG,
-			text: window.DM ? `<div class="d-block"><div>${text}</div><div class="text-center"><button ${window.DM ? `id="${uuid}"` : ""}>Send to Players</button></div></div>` : text,
+			text: text,
 			dmonly: window.DM || false,
 			id: window.DM ? `li_${uuid}` : undefined
 		};
-		window.MB.sendMessage('custom/myVTT/chat', data);
-		window.MB.handleChat(data,true);
-		if (window.DM) {
+		window.MB.inject_chat(data);
+		
+		if (window.DM) { // THIS STOPPED WORKING SINCE INJECT_CHAT
 			$("#" + uuid).on("click", () => {
 				const newData = {...data, dmonly: false, id: undefined, text: text};
-				window.MB.sendMessage('custom/myVTT/chat', newData);
-				window.MB.handleChat(newData,true);
-				$("#li_" + uuid).remove()
+				window.MB.inject_chat(newData);
+				$(this).remove();
 			});
 		}
 		$(".roll-button").removeClass("show");
@@ -1078,8 +1032,8 @@ function init_ui() {
 				text: text,
 				dmonly: dmonly,
 			};
-			window.MB.sendMessage('custom/myVTT/chat', data);
-			window.MB.handleChat(data,true);
+			window.MB.inject_chat(data);
+			
 		}
 
 	});
@@ -1252,7 +1206,6 @@ function init_ui() {
 	token_menu();
 
 
-
 	window.WaypointManager=new WaypointManagerClass();
 
 	init_spells();
@@ -1331,6 +1284,8 @@ function init_ui() {
 	});
 
 	init_mouse_zoom()
+
+	init_help_menu();
 }
 
 function init_buttons() {
@@ -1455,6 +1410,8 @@ function init_buttons() {
 		
 	}
 
+	buttons.append("<button style='display:inline;width:75px' id='help_button'>HELP</button>");
+
 	buttons.css("position", "fixed");
 	buttons.css("top", '5px');
 	buttons.css("left", '5px');
@@ -1464,10 +1421,62 @@ function init_buttons() {
 	draw_menu.find(".coloroption").first().click();
 
 	setup_draw_buttons();
-	
 	// HIDE default SEND TO functiontality in the campaign page:
 	
 	$(".GameLogHeader_Container__36cXS").hide();
+	
+	// STREAMING STUFF
+	
+	window.STREAMPEERS={};
+	window.MYSTREAMID=uuid();
+	window.JOINTHEDICESTREAM=false;
+	
+	var dicecanvas=$("<canvas id='dicecanvas' width=1024 height=600 />");
+	dicecanvas.css("width","1024");
+	dicecanvas.css("height","600");
+	//dicecanvas.css("opacity",0.5);
+	dicecanvas.css("position","fixed");
+	dicecanvas.css("top","100px");
+	dicecanvas.css("right","340px");
+	dicecanvas.css("z-index",9000);
+	dicecanvas.css("touch-action","none");
+	dicecanvas.css("pointer-events","none");
+	$("#site").append(dicecanvas);
+	
+	var stream_button=$("<button>STREAM</button>");
+	
+	stream_button.click(() => {
+		if(!window.JOINTHEDICESTREAM){
+			window.JOINTHEDICESTREAM=true;
+			window.MB.sendMessage("custom/myVTT/wannaseemydicecollection",{from:window.MYSTREAMID});
+			stream_button.css("background","red");
+		}
+		else{
+			window.JOINTHEDICESTREAM=false;
+			for(let i in window.STREAMPEERS){
+				window.STREAMPEERS[i].close();
+				delete window.STREAMPEERS[i];
+				stream_button.css("background","");
+			}
+		}
+	});
+	stream_button.addClass("stream_button");
+	stream_button.css("position","absolute");
+	if(window.DM)
+		stream_button.css("left","-190px");
+	else
+		stream_button.css("left","-240px");
+	
+	stream_button.css("background","yellow");
+	
+	
+	if(!$.browser.mozilla){ // DISABLE FOR FIREFOX
+		$(".sidebar__controls").append(stream_button);
+		setTimeout(() => stream_button.click(), 5000 );
+	}
+		
+		
+	init_keypress_handler();
 	
 }
 
@@ -1585,3 +1594,107 @@ $(function() {
 		});
 });
 
+
+function init_help_menu() {
+	$('body').append(`
+		<div id="help-container">
+			<div id="help-menu-outside"></div>
+			<div id="help-menu">
+				<div class="help-tabs">
+					<ul>
+						<li class="active"><a href="#tab1"> Keyboard shortcuts</a></li>
+						<li><a href="#tab2">FAQ</a></li>
+					</ul>
+				</div>
+
+				<section class="tabs-content">
+					<div id="tab1">
+						<h3>Keyboard Shortcuts</h3>
+						<dl>
+							<dt>SPACE</dt>
+							<dd>Show/hide character sheet (players only)</dd>
+						<dl>
+						<dl>
+							<dt>Q</dt>
+							<dd>Show/hide sidebar</dd>
+						<dl>
+						<dl>
+							<dt>ESC</dt>
+							<dd>Cancel button selections</dd>
+						<dl>
+						<dl>
+							<dt>S</dt>
+							<dd>Select tool</dd>
+						<dl>
+						<dl>
+							<dt>R</dt>
+							<dd>Ruler</dd>
+						<dl>
+						<dl>
+							<dt>F</dt>
+							<dd>Fog menu</dd>
+						<dl>
+						<dl>
+							<dt>D</dt>
+							<dd>Draw tool</dd>
+						<dl>
+						<dl>
+							<dt>C</dt>
+							<dd>Combat tracker</dd>
+						<dl>
+						<dl>
+							<dt>N</dt>
+							<dd>Next creature (if combat tracker is open)</dd>
+						<dl>
+						<dl>
+							<dt>-</dt>
+							<dd>Zoom out</dd>
+						<dl>
+						<dl>
+							<dt>=</dt>
+							<dd>Zoom in</dd>
+						<dl>
+						<dl>
+							<dt>CTRL (held)</dt>
+							<dd>Temporarily toggle grid snapping</dd>
+						<dl>
+						<dl>
+							<dt>ALT (held)</dt>
+							<dd>Temporarily activate ruler</dd>
+						<dl>
+						<dl>
+							<dt>UP/DOWN arrows</dt>
+							<dd>Will cycle through fog & draw options if menu open</dd>
+						<dl>
+					</div>
+
+					<div id="tab2">
+						<iframe src="https://docs.google.com/document/d/e/2PACX-1vRSJ6Izvldq5c9z_d-9-Maa8ng1SUK2mGSQWkPjtJip0cy9dxAwAug58AmT9zRtJmiUx5Vhkp7hATSt/pub?embedded=true"></iframe>
+					</div>
+					
+				</section>
+			</div>
+		</div>
+	`);
+
+	$('#help-container').fadeOut(0);
+
+	$(function() {
+        $('.help-tabs a').on('click', function() {
+        $('.help-tabs li').removeClass('active');
+        $(this).parent().addClass('active');
+        let currentTab = $(this).attr('href');
+        $('.tabs-content div').hide();
+        $(currentTab).show();
+        return false;
+        });
+    });
+
+	$('#help-menu-outside').on('click', function() {
+		$('#help-container').fadeOut(200);
+	});
+
+	$("#help_button").click(function(e) {
+		$('#help-container').fadeIn(200);
+	});
+}
