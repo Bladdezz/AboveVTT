@@ -437,7 +437,7 @@ function init_splash() {
 	cont.css('z-index', 999);
 	cont.css('border', '3px solid black');
 
-	cont.append("<h1 style='padding-bottom:2px;margin-bottom:2px; text-align:center'><img width='250px' src='" + window.EXTENSION_PATH + "assets/logo.png'><div style='margin-left:20px; display:inline;vertical-align:bottom;'>0.52RC2</div></h1>");
+	cont.append("<h1 style='padding-bottom:2px;margin-bottom:2px; text-align:center'><img width='250px' src='" + window.EXTENSION_PATH + "assets/logo.png'><div style='margin-left:20px; display:inline;vertical-align:bottom;'>0.52</div></h1>");
 	cont.append("<div style='font-style: italic;padding-left:80px;font-size:20px;margin-bottom:10px;margin-top:2px; margin-left:50px;'>Fine.. I'll do it myself..</div>");
 	
 	s=$("<div/>");
@@ -486,9 +486,9 @@ function init_splash() {
 
 	patreons = $("<div id='patreons' style='margin-top:9x;'/>");
 
-	l1 = ["Max Puplett", "Clipped Dragon", "Miguel  Garcia Jr.","Epyk","ZorkFox","Imaginary Voices"];
-	l2 = ["Iain Russell", "Lukas Edelmann", "Oliver", "Jordan Innerarity", "Chad Lenny", "Phillip Geurtz", "Virginia Lancianese", "Daniel Levitus", "RenoGeek", "TheDigifire", "Ryan Purcell", "adam williams", "Chance Russo", "Kris Scott", "Steve Carsella", "Brendan Shane", "Reginald Coupet", "Pucas McDookie", "Jordan Cohen", "Chris Johnson", "Elmer Senson", "Chris Cannon","David William Daniel Thomas","Tom","CritCat (ExpQuest)","Carl Cedarstaff II","Renato Villas Boas Medeiros","Kim Dargeou"];
-	l3 = ["Daniel Wall", "Cameron Warner", "Luis Mirandela", "Martin Brandt", "Julia Hoffmann", "Amata (she_her)", "Alexander Engel", "Fini Plays", "Tommy Girouard-Belhumeur", "nate gonzalez", "Jason Osterbind", "Daniel Villablanca", "William Geisbert", "Adam Nothnagel", "Kat", "Cobalt Blue", "Danny Pellerin", "Cody Vegas Rothwell", "damian tier", "CraftyHobo", "CrazyPitesh", "Milkmann", "aaron hamilton", "Eduardo Villela", "Paul Maloney", "David Meese","Adam Connor","mad4ever","Brad Stack","Johan Surac","Chris Sells","Tim Newton","Nick champion","Aviad Tal","Brahm","Randy Zuendel","M Mustaqim Mustafa","Robert J Correa","Jon Bond","Cistern","Liam Burke","James Cohen","Deku Baba","its Bonez","BelowtheDM","Unlucky Archer","Michael Crane","Han Dandler"];
+	l1 = ["Max Puplett", "Miguel  Garcia Jr.","Epyk","ZorkFox","Imaginary Voices","John NG","Mike Miller"];
+	l2 = ["Iain Russell", "Lukas Edelmann", "Oliver", "Jordan Innerarity", "Chad Lenny", "Phillip Geurtz", "Virginia Lancianese", "Daniel Levitus", "RenoGeek", "TheDigifire", "Ryan Purcell", "adam williams", "Chance Russo", "Kris Scott", "Brendan Shane", "Reginald Coupet", "Pucas McDookie", "Jordan Cohen", "Chris Johnson", "Elmer Senson", "Chris Cannon","David William Daniel Thomas","Tom","CritCat (ExpQuest)","Carl Cedarstaff II","Renato Villas Boas Medeiros","Kim Dargeou","Scott Moore"];
+	l3 = ["Daniel Wall", "Cameron Warner", "Martin Brandt", "Julia Hoffmann", "Amata (she_her)", "Alexander Engel", "Fini Plays", "Tommy Girouard-Belhumeur", "nate gonzalez", "Jason Osterbind", "Daniel Villablanca", "William Geisbert", "Adam Nothnagel", "Kat", "Cobalt Blue", "Danny Pellerin", "Cody Vegas Rothwell", "damian tier", "CraftyHobo", "CrazyPitesh", "Milkmann", "aaron hamilton", "Eduardo Villela", "Paul Maloney", "David Meese","Adam Connor","mad4ever","Brad Stack","Johan Surac","Chris Sells","Tim Newton","Nick champion","Aviad Tal","Brahm","Randy Zuendel","M Mustaqim Mustafa","Robert J Correa","Jon Bond","Cistern","James Cohen","Deku Baba","its Bonez","BelowtheDM","Unlucky Archer","Michael Crane","Han Dandler","Matt Scullion","Trevor A","Dan Bosscher"];
 
 	l1div = $("<div class='patreons-title'>Masters of the Realms</div>");
 	l1ul = $("<ul/>");
@@ -519,6 +519,8 @@ function init_splash() {
 
 	});
 
+	let closeButton = $(`<button class="ddbeb-modal__close-button qa-modal_close" title="Close Modal" ><svg class="" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><g transform="rotate(-45 50 50)"><rect x="0" y="45" width="100" height="10"></rect></g><g transform="rotate(45 50 50)"><rect x="0" y="45" width="100" height="10"></rect></g></svg></button>`);
+	cont.append(closeButton);
 
 	$(window.document.body).append(cont);
 
@@ -912,6 +914,7 @@ function init_ui() {
 	window.BLOCKCONTROLS = false;
 	window.PLAYER_STATS = {};
 	window.TOKEN_SETTINGS = $.parseJSON(localStorage.getItem('TokenSettings' + gameid)) || {};
+	window.CURRENTLY_SELECTED_TOKENS = [];
 
 	window.MB = new MessageBroker();
 	window.StatHandler = new StatHandler();
@@ -1132,8 +1135,9 @@ function init_ui() {
 		//	deselect_all_tokens();
 	});*/
 	fog.on("mousedown", function(e) {
-		if (e.button == 0)
+		if (e.button == 0 && shiftHeld == false) {
 			deselect_all_tokens();
+		}
 	});
 
 	window.ZOOM = 1.0;
@@ -1236,6 +1240,8 @@ function init_ui() {
 	init_combat_tracker();
 
 	token_menu();
+	build_token_image_map_menu();
+	load_custom_image_mapping();
 
 
 	window.WaypointManager=new WaypointManagerClass();
@@ -1282,10 +1288,12 @@ function init_ui() {
 	}
 
 	// Function separated so it can be dis/enabled
-	function mouseup() {
-
+	function mouseup(event) {
 		curDown = false;
 		$("body").css("cursor", "");
+		if (event.target.tagName.toLowerCase() !== 'a') {
+			$("#splash").remove(); // don't remove the splash screen if clicking an anchor tag otherwise the browser won't follow the link
+		}
 	}
 
 	// Helper function to disable window mouse handlers, required when we
