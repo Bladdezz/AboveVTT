@@ -49,6 +49,12 @@ class Token {
 		}
 	}
 
+	isPlayer() {
+		// player tokens have ids with a structure like "/profile/username/characters/someId"
+		// monster tokens have a uuid for their id
+		return this.options.id.includes("/")
+	}
+
 	size(newsize) {
 		this.update_from_page();
 		this.options.size = newsize;
@@ -75,6 +81,7 @@ class Token {
 			this.persist();
 	}
 	rotate(newRotation) {
+		if (this.options.locked) return; // don't allow rotation if the token is locked
 		this.update_from_page();
 		this.options.rotation = newRotation;
 		// this is copied from the place() function. Rather than calling place() every time the draggable.drag function executes, 
@@ -689,9 +696,11 @@ class Token {
 			tok.draggable({
 				stop:
 					function (event) {
-
-						// CHECK IF SNAPPING IS ENABLED
-						if (window.CURRENT_SCENE_DATA.snap == "1") {
+						// this should be a XOR... (A AND !B) OR (!A AND B)
+						let shallwesnap=  (window.CURRENT_SCENE_DATA.snap == "1"  && !(window.toggleSnap)) || ((window.CURRENT_SCENE_DATA.snap != "1") && window.toggleSnap);
+						console.log("shallwesnap",shallwesnap);
+						console.log("toggleSnap",window.toggleSnap);					
+						if (shallwesnap) {
 
 							// calculate offset in real coordinates
 							const startX = window.CURRENT_SCENE_DATA.offsetx;
@@ -745,9 +754,20 @@ class Token {
 								}
 							}
 
+						} else {
+							// we want to remove the pause_click even when grid snapping is turned off
+							for (var id in window.TOKEN_OBJECTS) {
+								if (window.TOKEN_OBJECTS[id].selected) {
+									setTimeout(function(tempID) {
+										$("[data-id='"+tempID+"']").removeClass("pause_click");
+										console.log($("[data-id='"+id+"']"));
+									}, 200, id);
+								}
+							}
 						}
 
 						window.DRAGGING = false;
+						
 						self.update_and_sync(event);
 						if (self.selected) {
 							for (id in window.TOKEN_OBJECTS) {
@@ -760,6 +780,7 @@ class Token {
 						}
 
 						draw_selected_token_bounding_box();
+						window.toggleSnap=false;
 					},
 
 				start: function (event) {
@@ -977,7 +998,17 @@ function token_button(e, tokenIndex = null, tokenTotal = null) {
 		},
 		auraVisible: true
 	};
-
+	
+	
+	if(typeof $(e.target).attr('data-stat') !== "undefined"){ // APPLY SAVED TOKEN SETTINGS ONLY FOR MONSTERS
+		for(let o in window.TOKEN_SETTINGS){
+				if(window.TOKEN_SETTINGS[o]){
+					options[o]="1";
+				}
+		}
+	}
+	
+	
 	if ($(e.target).attr('data-size')) {
 		options.size = $(e.target).attr('data-size');
 	}
@@ -1055,7 +1086,7 @@ function token_button(e, tokenIndex = null, tokenTotal = null) {
 		options.top = (centerY + (((options.size || 68.33) * 5) / 2) * Math.sin(2 * Math.PI * tokenIndex / tokenTotal)) + 'px';
 	}
 
-	options = Object.assign({}, options, window.TOKEN_SETTINGS);
+	//options = Object.assign({}, options, window.TOKEN_SETTINGS);
 	window.ScenesHandler.create_update_token(options);
 
 	if (id in window.PLAYER_STATS) {
@@ -1362,13 +1393,39 @@ function token_menu() {
 		build: function(element, e) {
 
 			if ($(element).hasClass("tokenselected") && window.MULTIPLE_TOKEN_SELECTED) {
+				if (!window.DM) {
+					// players can't do anything to multiple tokens, currently
+					return {
+						items: { 
+							helptext: {
+								name: 'You cannot apply changes to multiple tokens',
+								className: 'context-menu-helptext',
+								disabled: true
+							}
+						}
+					}
+				}
 				ret = {
 					callback: multiple_callback,
 					items: {
 						token_combat: { name: 'Add to Combat Tracker' },
 						hide: { name: 'Hide From Players' },
 						show: { name: 'Show To Players' },
-						delete: { name: 'Delete Token' }
+						delete: { name: 'Delete Token' },
+						token_locked: {
+							type: 'checkbox',
+							name: 'Lock Tokens in Position',
+							events: {
+								click: function(e) {
+									if (e.target == undefined || e.target.checked == undefined) return;
+									$("#tokens .tokenselected").each(function() {
+										id = $(this).attr('data-id');
+										window.TOKEN_OBJECTS[id].options.locked = e.target.checked;
+										window.TOKEN_OBJECTS[id].place_sync_persist();
+									});							
+								}
+							}
+						}
 					}
 				};
 				return ret;
@@ -1669,6 +1726,7 @@ function token_menu() {
 				};
 				if (is_monster) {
 					delete ret.items.options.items.token_hidestat;
+					delete ret.items.sep4;
 					delete ret.items.helptext;
 				}
 				else {
@@ -1688,6 +1746,7 @@ function token_menu() {
 				}
 				
 				if(!window.DM){
+					delete ret.items.sep0;
 					delete ret.items.view;
 					delete ret.items.token_combat;
 					delete ret.items.token_hidden;
@@ -1698,6 +1757,7 @@ function token_menu() {
 					delete ret.items.max_hp;
 					delete ret.items.delete;
 					delete ret.items.name;
+					delete ret.items.sep2;
 					//delete ret.items.imgsrc;
 					delete ret.items.imgsrcSelect;
 				}
@@ -1882,7 +1942,7 @@ function add_custom_image_mapping(monsterId, imgsrc) {
 		return;
 	}
 	var customImages = get_custom_monster_images(monsterId);
-	customImages.push(imgsrc);
+	customImages.push(parse_img(imgsrc));
 	window.CUSTOM_TOKEN_IMAGE_MAP[monsterId] = customImages;
 	save_custom_image_mapping();
 }
@@ -2126,3 +2186,55 @@ function remove_selected_token_bounding_box() {
 	$("#rotationGrabber").remove();
 }
 
+function copy_selected_tokens() {
+	if (!window.DM) return;
+	window.TOKEN_PASTE_BUFFER = [];
+	let redrawBoundingBox = false;
+	for (id in window.TOKEN_OBJECTS) {
+		let token = window.TOKEN_OBJECTS[id];
+		if (token.selected) { 
+			if (token.isPlayer()) {
+				// deselect player tokens to avoid confusion about them being selected but not copy/pasted
+				window.TOKEN_OBJECTS[id].selected = false;
+				window.TOKEN_OBJECTS[id].place_sync_persist();
+				redrawBoundingBox = true;
+			} else {
+				// only allow copy/paste for selected monster tokens
+				window.TOKEN_PASTE_BUFFER.push(id);
+			}
+		}
+	}
+	if (redrawBoundingBox) {
+		draw_selected_token_bounding_box();
+	}
+}
+
+function paste_selected_tokens() {
+	if (!window.DM) return;
+	if (window.TOKEN_PASTE_BUFFER == undefined) {
+		window.TOKEN_PASTE_BUFFER = [];
+	}
+
+	for (let i = 0; i < window.TOKEN_PASTE_BUFFER.length; i++) {
+		let id = window.TOKEN_PASTE_BUFFER[i];
+		let token = window.TOKEN_OBJECTS[id];
+		if (token == undefined || token.isPlayer()) continue; // only allow copy/paste for monster tokens, and protect against pasting deleted tokens
+		let options = Object.assign({}, token.options);
+		let newId = uuid();
+		options.id = newId;
+		// TODO: figure out the location under the cursor and paste there instead of doing an offset
+		options.top = `${parseFloat(options.top) + Math.round(options.size / 2)}px`;
+		options.left = `${parseFloat(options.left) + Math.round(options.size / 2)}px`;
+		options.selected = true;
+		window.ScenesHandler.create_update_token(options);
+		// deselect the old and select the new so the user can easily move the new tokens around after pasting them
+		window.TOKEN_OBJECTS[id].selected = false;
+		window.TOKEN_OBJECTS[id].place_sync_persist();
+		window.TOKEN_OBJECTS[newId].selected = true;
+		window.TOKEN_OBJECTS[newId].place_sync_persist();
+	}
+
+	// copy the newly selected tokens in case they paste again, we want them pasted in reference to the newly created tokens
+	copy_selected_tokens();
+	draw_selected_token_bounding_box();
+}
