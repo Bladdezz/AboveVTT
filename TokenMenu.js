@@ -1981,7 +1981,7 @@ function fill_tokenmenu(path){
 		var newentry=$(`
 			<div data-path='${newpath}' class='tokenfolder tokenmenuitem'>
 				<img data-path='${newpath}' class='tokenentryimg tokenfolderimg' src='${window.EXTENSION_PATH+"assets/folder.svg"}'>
-				<div>${f}</div>
+				<div class="label-one-line">${f}</div>
 			</div>
 		`);
 		if(!path.startsWith("/AboveVTT BUILTIN") && !f.startsWith("AboveVTT BUILTIN")){
@@ -1989,9 +1989,12 @@ function fill_tokenmenu(path){
 			delbutton.attr('data-target',f);
 			newentry.append(delbutton);
 			delbutton.click(function(e){
-				delete window.CURRENT_TOKEN_FOLDER.folders[$(this).attr('data-target')];
-				fill_tokenmenu(window.CURRENT_TOKEN_PATH);
-				persist_customtokens();
+				r = confirm("This will delete this token folder. Are you sure?");
+				if (r == true) {
+					delete window.CURRENT_TOKEN_FOLDER.folders[$(this).attr('data-target')];
+					fill_tokenmenu(window.CURRENT_TOKEN_PATH);
+					persist_customtokens();
+				}
 			});
 		}
 		$("#tokens-panel-data").append(newentry);
@@ -2004,7 +2007,7 @@ function fill_tokenmenu(path){
 		var newentry=$(`
 			<div class='tokenentry tokenmenuitem'>
 				<img class='tokenentryimg' src='${parse_img(folder.tokens[t]["data-img"])}'></img>
-				<div>${t}</div>
+				<div class="label-one-line">${t}</div>
 				<button class='tokenadd' >Token</button>
 			</div>
 		`);
@@ -2020,9 +2023,12 @@ function fill_tokenmenu(path){
 		}
 		
 		newentry.find(".tokendel").click(function(){
-			delete window.CURRENT_TOKEN_FOLDER.tokens[$(this).attr('data-target')];
-			fill_tokenmenu(window.CURRENT_TOKEN_PATH);
-			persist_customtokens();
+			r = confirm("This will delete this token. Are you sure?");
+			if (r == true) {
+				delete window.CURRENT_TOKEN_FOLDER.tokens[$(this).attr('data-target')];
+				fill_tokenmenu(window.CURRENT_TOKEN_PATH);
+				persist_customtokens();
+			}
 		});
 		
 		$("#tokens-panel-data").append(newentry);

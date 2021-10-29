@@ -1,5 +1,7 @@
 
 function init_combat_tracker(){
+	window.ROUND_NUMBER =1;
+	
 	ct=$("<div id='combat_tracker'/>");
 	ct.css("height","20px"); // IMPORTANT
 	toggle=$("<button id='combat_button' class='hideable'><u>C</u>OMBAT</button>");
@@ -22,6 +24,36 @@ function init_combat_tracker(){
 	const ct_list_wrapper = $(`<div class="tracker-list"></div>`);
 	ct_list_wrapper.append(ct_area);
 	ct_inside.append(ct_list_wrapper);
+	
+	rn = $(`<div id='round_number_label'><strong>ROUND:</strong><input class="roundNum" style="font-size: 11px; width: 24px; appearance: none;" type='number' id='round_number' value=${window.ROUND_NUMBER}></div>`)
+	reset_rounds=$("<button style='font-size: 10px;'>RESET</button>");
+	
+	reset_rounds.click(function (){
+		window.ROUND_NUMBER = 1;
+		document.getElementById('round_number').value = window.ROUND_NUMBER;
+		$("#combat_area tr").first().attr('data-current','1');
+		next.removeAttr('data-current');
+		next.css('background','');
+		ct_persist();
+	});
+
+	rn.find("#round_number").change(function (data) {
+		if( !isNaN(data.currentTarget.value)){
+			window.ROUND_NUMBER = Math.round(data.currentTarget.value);
+			ct_persist();
+		}
+		document.getElementById('round_number').value = window.ROUND_NUMBER;
+	});
+	
+	ct_inside.append(rn);
+	if(window.DM)
+	{
+		rn.append(reset_rounds);
+	}
+	else
+	{
+		rn.find("#round_number").prop("readonly", true);
+	}
 	
 	buttons=$("<div id='combat_footer'/>");
 	
@@ -47,6 +79,8 @@ function init_combat_tracker(){
 	clear=$("<button>CLEAR</button>");
 	clear.click(function(){
 		$("#combat_area").empty();
+		window.ROUND_NUMBER = 1;
+		document.getElementById('round_number').value = window.ROUND_NUMBER;
 		ct_persist();
 	});
 	
@@ -65,6 +99,8 @@ function init_combat_tracker(){
 			current.css('background','');
 			next=current.next();
 			if(next.length==0){
+				window.ROUND_NUMBER++;
+				document.getElementById('round_number').value = window.ROUND_NUMBER;
 				next=$("#combat_area tr").first()
 			}
 			next.attr('data-current','1');
@@ -88,16 +124,18 @@ function init_combat_tracker(){
 		});
 		
 	});
+	
+	
 	if(window.DM){
 		buttons.append(roll);
 		buttons.append(clear);
 		buttons.append(reroll);
 		buttons.append(next);
-		buttons.css('font-size','8px');
+		buttons.css('font-size','10px');
 		
 		ct_inside.append(buttons);
 	}
-
+	
 	if(window.DM) {
 		ct.addClass('tracker-dm');
 	} else {
@@ -124,6 +162,10 @@ function ct_reorder(persist=true) {
 function ct_add_token(token,persist=true,disablerolling=false){
 	// TODO: check if the token is already in the tracker..
 	
+	token.options.combat = true;
+	token.sync();
+	if (token.persist != null) token.persist();
+	
 	selector="#combat_area tr[data-target='"+token.options.id+"']";
 	if($(selector).length>0)
 		return;
@@ -147,7 +189,7 @@ function ct_add_token(token,persist=true,disablerolling=false){
 	img.css('border','3px solid '+token.options.color);
 	
 	entry.append($("<td/>").append(img));
-	let init=$("<input class='init' maxlength=2 style='font-size:10px;'>");
+	let init=$("<input class='init' maxlength=2 style='font-size:12px;'>");
 	init.css('width','20px');
 	init.css('-webkit-appearance','none');
 	if(window.DM){
@@ -173,7 +215,7 @@ function ct_add_token(token,persist=true,disablerolling=false){
 	hp=$("<div class='hp'/>");
 	hp.text(token.options.hp);
 	
-	hp.css('font-size','10px');
+	hp.css('font-size','11px');
 	//hp.css('width','20px');
 	if(window.DM || !(token.options.monster > 0) )
 		entry.append($("<td/>").append(hp));
@@ -181,7 +223,7 @@ function ct_add_token(token,persist=true,disablerolling=false){
 		entry.append($("<td/>"))
 	max_hp=$("<div/>");
 	max_hp.text("/"+token.options.max_hp);
-	max_hp.css('font-size','10px');
+	max_hp.css('font-size','11px');
 	//max_hp.css('width','20px');
 	if(window.DM || !(token.options.monster > 0) )
 		entry.append($("<td/>").append(max_hp));
@@ -192,7 +234,7 @@ function ct_add_token(token,persist=true,disablerolling=false){
 	var buttons=$("<td/>");
 	
 	
-	find=$("<button style='font-size:8px;'>FIND</button>");
+	find=$("<button style='font-size:10px;'>FIND</button>");
 	find.click(function(){
 		var target=$(this).parent().parent().attr('data-target');
 		if(target in window.TOKEN_OBJECTS){
@@ -203,7 +245,7 @@ function ct_add_token(token,persist=true,disablerolling=false){
 	
 	buttons.append(find);
 	
-	del=$("<button style='font-size:8px;'>DEL</button>");
+	del=$("<button style='font-size:10px;'>DEL</button>");
 	del.click(
 		function(){
 			if($(this).parent().parent().attr("data-current")=="1"){
@@ -217,7 +259,7 @@ function ct_add_token(token,persist=true,disablerolling=false){
 		buttons.append(del);
 	
 	if(token.options.monster > 0){
-		stat=$("<button style='font-size:8px;'>STAT</button>");
+		stat=$("<button style='font-size:10px;'>STAT</button>");
 		
 		stat.click(function(){
 			iframe_id="#iframe-monster-"+token.options.monster;
@@ -233,7 +275,7 @@ function ct_add_token(token,persist=true,disablerolling=false){
 		
 	}	
 	else{
-		stat=$("<button style='font-size:8px;'>STAT</button>");
+		stat=$("<button style='font-size:10px;'>STAT</button>");
 		stat.click(function(){
 			open_player_sheet(token.options.id);
 		});
@@ -258,9 +300,11 @@ function ct_persist(){
 	  data.push( {
 		'data-target': $(this).attr("data-target"),
 		'init': $(this).find(".init").val(),
-		'current': ($(this).attr("data-current")=="1"),
+		'current': ($(this).attr("data-current")=="1")
 	   });
 	});
+	data.push({'data-target': 'round',
+				'round_number':window.ROUND_NUMBER});
 	
 	var itemkey="CombatTracker"+$("#message-broker-client").attr("data-gameId");
 	
@@ -284,8 +328,33 @@ function ct_load(data=null){
 					$("#combat_area tr[data-target='"+data[i]['data-target']+"']").attr("data-current","1");
 				}
 			}
+			else if (data[i]['data-target'] === 'round')
+			{
+				window.ROUND_NUMBER = data[i]['round_number'];
+				document.getElementById('round_number').value = window.ROUND_NUMBER;
+			}
 		}
 	}
 	if(window.DM)
 		ct_persist();
+}
+
+function ct_remove_token(token,persist=true) {
+
+	if (persist == true) {
+		token.options.combat = false;
+		token.sync();
+		if (token.persist != null) token.persist();
+	}
+
+	let id = token.options.id;
+	if ($("#combat_area tr[data-target='" + id + "']").length > 0) {
+		if ($("#combat_area tr[data-target='" + id + "']").attr('data-current') == "1") {
+			$("#combat_next_button").click();
+		}
+		$("#combat_area tr[data-target='" + id + "']").remove(); // delete token from the combat tracker if it's there
+	}
+	if (persist) {
+		ct_persist();
+	}
 }

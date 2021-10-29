@@ -6,6 +6,17 @@ function parse_img(url){
 	return retval;
 }
 
+function whenAvailable(name, callback) {
+    var interval = 10; // ms
+    window.setTimeout(function() {
+        if (window[name]) {
+            callback(window[name]);
+        } else {
+            whenAvailable(name, callback);
+        }
+    }, interval);
+}
+
 
 function getRandomColorOLD() {
 	var letters = '0123456789ABCDEF';
@@ -44,6 +55,22 @@ function validateUrl(value) {
   return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value);
 }
 
+function loadScript(url, callback) {
+	// Adding the script tag to the head as suggested before
+	var head = document.head;
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.src = url;
+
+	// Then bind the event to the callback function.
+	// There are several events for cross browser compatibility.
+	script.onreadystatechange = callback;
+	script.onload = callback;
+
+	// Fire the loading
+	head.appendChild(script);
+}
+
 const MAX_ZOOM = 5
 const MIN_ZOOM = 0.1
 function change_zoom(newZoom, x, y) {
@@ -78,7 +105,19 @@ function increase_zoom() {
 	change_zoom(window.ZOOM * 1.10)
 }
 
-
+function getPlayerIDFromSheet(sheet_url)
+{
+	let playerID = -1;
+	if(sheet_url)
+	{
+		let urlSplit = sheet_url.split("/");
+		if(urlSplit.length > 0)
+		{
+			playerID = urlSplit[urlSplit.length - 1];
+		}
+	}
+	return playerID;
+}
 
 window.YTTIMEOUT = null;
 
@@ -290,7 +329,7 @@ function load_monster_stat(monsterid) {
 					var msgdata = {
 						player: window.PLAYER_NAME,
 						img: window.PLAYER_IMG,
-						text: "<img width='100%' src='" + imgsrc + "'>",
+						text: "<img width='100%' class='magnify' href='" + imgsrc + "' src='" + imgsrc + "'>",
 					};
 
 					window.MB.inject_chat(msgdata);
@@ -367,9 +406,14 @@ function init_controls() {
 	b6.click(switch_control);
 	$(".sidebar__controls").append(b6);
 	
-	b4 = $("<button id='switch_spell' class='tab-btn hasTooltip button-icon' data-name='Spells' data-target='#spells-panel'></button>").click(switch_control);
-	b4.append("<img src='"+window.EXTENSION_PATH + "assets/icons/magic-wand.svg' height='100%;'>");
+	b4 = $("<button id='switch_journal' class='tab-btn hasTooltip button-icon' data-name='Journal' data-target='#journal-panel'></button>");
+	b4.append("<img src='" + window.EXTENSION_PATH + "assets/conditons/note.svg' height='100%;'>");
+	b4.click(switch_control);
 	$(".sidebar__controls").append(b4);
+	
+	/*b4 = $("<button id='switch_spell' class='tab-btn hasTooltip button-icon' data-name='Spells' data-target='#spells-panel'></button>").click(switch_control);
+	b4.append("<img src='"+window.EXTENSION_PATH + "assets/icons/magic-wand.svg' height='100%;'>");
+	$(".sidebar__controls").append(b4);*/
 
 	if (DM) {
 		b7 = $("<button id='switch_tokens' class='tab-btn hasTooltip button-icon' data-name='Settings' data-target='#settings-panel'></button>");
@@ -430,7 +474,7 @@ function init_splash() {
 	cont = $("<div id='splash'></div>");
 	cont.css('background', "url('/content/1-0-1487-0/skins/waterdeep/images/mon-summary/paper-texture.png')");
 
-	cont.append("<h1 style='padding-bottom:2px;margin-bottom:2px; text-align:center'><img width='250px' src='" + window.EXTENSION_PATH + "assets/logo.png'><div style='margin-left:20px; display:inline;vertical-align:bottom;'>0.53RC2</div></h1>");
+	cont.append("<h1 style='padding-bottom:2px;margin-bottom:2px; text-align:center'><img width='250px' src='" + window.EXTENSION_PATH + "assets/logo.png'><div style='margin-left:20px; display:inline;vertical-align:bottom;'>0.59</div></h1>");
 	cont.append("<div style='font-style: italic;padding-left:80px;font-size:20px;margin-bottom:10px;margin-top:2px; margin-left:50px;'>Fine.. I'll do it myself..</div>");
 	
 	s=$("<div/>");
@@ -473,15 +517,16 @@ function init_splash() {
 	ul.append("<li><a style='font-weight:bold;text-decoration: underline;' target='_blank' href='https://www.patreon.com/AboveVTT'>Patreon</a></li>");
 	cont.append(ul);*/
 	cont.append("Author, owner and technowizard: <b>Daniele <i>cyruzzo</i> Martini</b><br>Community & Collaborations Manager: <b>SnailDice (Nadav)</b>");
-	cont.append("<br>Contributors: <b>Stumpy, Palad1N, KuzKuz, Coryphon, Johnno, Hypergig, JoshBrodieNZ, Kudolpf, Koals, Mikedave</b>");
-	cont.append("<h3>Patreon Supporters</h3>");
-	cont.append("AboveVTT is not financed by any company. It started as a hobby project and I'm dedicating a lot of my time to it. It's totally opensource and there won't be any paid version. If you like it, and want to see it grow, please consider supporting me on <a style='font-weight:bold;text-decoration: underline;' target='_blank' href='https://www.patreon.com/AboveVTT'>Patreon</a>");
+	cont.append("<br>Contributors: <b>Stumpy, Palad1N, KuzKuz, Coryphon, Johnno, Hypergig, JoshBrodieNZ, Kudolpf, Koals, Mikedave, Jupi Taru, Limping Ninja</b>");
+	//cont.append("<h3>Patreon Supporters</h3>");
+	
+	cont.append("<br>AboveVTT is not financed by any company. It started as a hobby project and I'm dedicating a lot of my time to it. It's totally opensource and there won't be any paid version. If you like it, and want to see it grow, please consider supporting me on <a style='font-weight:bold;text-decoration: underline;' target='_blank' href='https://www.patreon.com/AboveVTT'>Patreon</a>. Here's a list of the current supporters");
 
 	patreons = $("<div id='patreons' style='margin-top:9px;'/>");
 
-	l1 = ["Michael Sangregorio","Max Puplett","Miguel  Garcia Jr.","ZorkFox","Epyk","John Ng","Josh Downing","Zytiga Gaming"];
-	l2 = ["Oliver","Iain Russell","RenoGeek","Daniel Levitus","Virginia Lancianese","Phillip Geurtz","Jordan Innerarity","TheDigifire","adam williams","Reginald Coupet","Brendan Shane","Kris Scott","Drago Russo","Ryan Purcell","Lukas Edelmann","Elmer Senson","Chris Johnson","Jordan Cohen","Pucas McDookie","Carl Cedarstaff II","Sarah (ExpQuest)","Tom","Chris Cannon","Renato Villas Boas Medeiros","Scott Moore","Kim Dargeou","Mike Miller"];
-	l3 = ["Daniel Wall","Cameron Warner","Amata (she_her)","Julia Hoffmann","Martin Brandt","Alexander Engel","Tommy Girouard-Belhumeur","Cobalt Blue","Kat","Adam Nothnagel","William Geisbert","Daniel Villablanca","Jason Osterbind","nate gonzalez","Fini Plays","Liu XxX","Paul Maloney","damian tier","Danny Pellerin","Randy Zuendel","Brahm","Tim Newton","Chris Sells","Brad Stack","Adam Connor","David Meese","Eduardo Villela","aaron hamilton","Milkmann","CraftyHobo","Cody Vegas Rothwell","Johan Surac","M Mustaqim Mustafa","Aviad Tal","mad4ever","CrazyPitesh","Matt Scullion","Unlucky Archer","Trevor A","Han Dandler","Michael Crane","BelowtheDM","its Bonez","Deku Baba","James Cohen","Cistern","Jon Bond","Robert J Correa","Dan Bosscher","Ofek Shoham","Cheeky Sausage Games","Joseph Bendickson","Blake Thomas","Steve Vlaminck","Victor Waters","Alexander Glass"];
+	l1 = ["Max Puplett","Jordan Cohen","Epyk","ZorkFox","John Ng","Zytiga Gaming","Josh Downing","John Curran","Flek","Nathan Wilhelm","The Dread Pirate Mittens","Mike Miller"];
+	l2 = ["Iain Russell","Lukas Edelmann","Oliver","Jordan Innerarity","Phillip Geurtz","Virginia Lancianese","Daniel Levitus","RenoGeek","TheDigifire","Ryan Purcell","adam williams","Drago Russo","Kris Scott","Brendan Shane","Pucas McDookie","Chris Johnson","Elmer Senson","Chris Cannon","Tom","Carl Cedarstaff II","Kim Dargeou","Scott Moore","Starving Actor","Kurt Piersol","Joaquin Atwood-Ward","Tittus","Rooster","Michael Palm","Robert Henry","Cynthia Complese"];
+	l3 = ["Daniel Wall","Cameron Warner","Martin Brandt","Julia Hoffmann","Amata (she_her)","Alexander Engel","Fini Plays","Tommy Girouard-Belhumeur","nategonz","Jason Osterbind","Daniel Villablanca","William Geisbert","Adam Nothnagel","Miguel  Garcia Jr.","Kat","Cobalt Blue","Cody Vegas Rothwell","damian tier","CraftyHobo","CrazyPitesh","Milkmann","aaron hamilton","Eduardo Villela","Paul Maloney","David Meese","Adam Connor","mad4ever","Johan Surac","Chris Sells","Sarah (ExpQuest)","Aviad Tal","Randy Zuendel","M Mustaqim Mustafa","Robert J Correa","Jon Bond","Cistern","James Cohen","its Bonez","BelowtheDM","Unlucky Archer","Michael Crane","Alexander Glass","Steve Vlaminck","Blake Thomas","Joseph Bendickson","Cheeky Sausage Games","Jerry Jones","David Hollenbeck","Kevin Young","aDingoAteMyBaby","Rennie","William Clem","Chris Meece","Victor Martinez","Ian Leyco","Michael Gisby","Dorian Arcos","Arish Rustomji","Christian Johansson","Gregory Willis","Kat Wells","DH Ford","Dirk Wynkoop","Michael Augusteijn","Jake Tiffany","LegalMegumin","Substrate","Nicholas Phillips","Don Walton","Squirrel666Zmbi","Patrick Wolfer","Garry Rose","Wilko Rauert","Alexander Klein","Mage","Dee Rivers","Robert Sanderson","Michael Huffman","Rennan Whittington"];
 
 	l1div = $("<div class='patreons-title'>Masters of the Realms</div>");
 	l1ul = $("<ul/>");
@@ -583,61 +628,92 @@ function init_spells() {
 
 }
 
-
-function open_player_sheet(sheet_url) {
-
+function init_sheet(){
 	let container = $("<div id='sheet'></div>");
-	let iframe = $("<iframe src='" + sheet_url + "'></iframe>");
-	iframe.css("width", "100%");
+	
+	//container.css('display', 'none');
+	container.css('height', '0px');
+	container.css('width', 1025);
+	container.css('background', '#242527');
+	container.css('z-index', 0);
+	var buttonleft = 0;
+		
+	var close_button = $("<button>X</button>");
 
-	container.append(iframe);
+	close_button.css("position", "absolute");
+	close_button.css('display', 'none');
+	close_button.css("top", "0px");
+	close_button.css("left", buttonleft);
+	buttonleft+=27;
+	close_button.css("height", "23px");
+	close_button.css("width", "25px");
+	close_button.click(function() {
+		$("#sheet").find("iframe").each(function(){
+			if($(this).css('height') !== '0px')
+			{
+				close_player_sheet($(this).attr('src'));
+			}
+		});
+	});
+	container.append(close_button);
+	
+	var reload_button = $("<button>🗘</button>");
+
+	reload_button.css("position", "absolute");
+	reload_button.css('display', 'none');
+	reload_button.css("top", "0px");
+	reload_button.css("left", buttonleft);
+	reload_button.css("height", "23px");
+	reload_button.css("width", "25px");
+	reload_button.click(function() {
+		$("#sheet").find("iframe").each(function(){
+			if($(this).css('height') !== '0px')
+			{
+				$(this).attr('src', $(this).attr('src'));
+			}
+		});
+	});
+	container.append(reload_button);
+	
+	//container.height($(".sidebar__inner").height() - 20);
+	
+	$("#site").append(container);
 	container.css('position', 'fixed');
-
-
+	container.css('right', 343 - 1530);
+	container.css('top', 40);
 
 	if (!window.DM) {
-		container.css('right', 343 - 1530);
-		container.css('z-index', 0);
-	}
-	else {
-		container.css("right", 343 + parseInt($(".sidebar").css("right")));
-		container.css("z-index", 99999999);
-		if ($("#sheet").length > 0) { // DESTROY ANY PREVIOUS SHEET AND ULOCKIT
-			data = {
-				player_sheet: $("#sheet iframe").attr('src')
-			};
-			window.MB.sendMessage("custom/myVTT/unlock", data);
-			$("#sheet").remove();
-		}
-		// LOCK!
-		data = {
-			player_sheet: sheet_url
-		};
-		window.MB.sendMessage("custom/myVTT/lock", data);
+		
+		let iframe =  $("[id='PlayerSheet"+window.PLAYER_ID+"']");
+		sheet_button = $("<button id='sheet_button' class='hasTooltip button-icon hideable' data-name='Show/hide character sheet (SPACE)'>SHEET</button>");
+		sheet_button.css("position", "absolute");
+		sheet_button.css("top", 0);
+		sheet_button.css("left", -86);
+		sheet_button.css("z-index", 999);
 
-		var close_button = $("<button>X</button>");
+		$(".sidebar__controls").append(sheet_button);
 
-		close_button.css("position", "absolute");
-		close_button.css("top", "0px");
-		close_button.css("left", "0px");
-		close_button.click(function() {
-			data = {
-				player_sheet: $("#sheet iframe").attr('src')
-			};
-			window.MB.sendMessage("custom/myVTT/unlock", data);
-			$("#sheet").remove();
+		sheet_button.click(function(e) {
+			open_player_sheet(window.PLAYER_SHEET);
+
 		});
-		container.append(close_button);
-
-
 	}
+}
 
-
-	container.css('width', 1030);
-	container.css('top', 40);
-	container.height($(".sidebar__inner").height() - 20);
-	iframe.height(container.height() - 20);
-
+function init_player_sheet(pc_sheet, loadWait = 0)
+{
+	
+	let container = $("#sheet");
+	iframe = $("<iframe id='PlayerSheet"+getPlayerIDFromSheet(pc_sheet)+"' src=''></iframe>")
+	//iframe.css('display', 'none');
+	iframe.css("width", "100%");
+	iframe.css("position", "absolute");
+	iframe.css("top", "24px");
+	iframe.css("left", "0px");
+	iframe.css("height", "0px");
+	iframe.attr('data-sheet_url', pc_sheet);
+	iframe.attr('data-init_load', 0);
+	container.append(iframe);
 	iframe.on("load", function(event) {
 		$(event.target).contents().find("#mega-menu-target").remove();
 		$(event.target).contents().find(".site-bar").remove();
@@ -649,32 +725,34 @@ function open_player_sheet(sheet_url) {
 		if(!window.DM){
 			let firstTime=false;
 			if(!window.MYMEDIASTREAM)
-				firstTime=true;
-			window.MYMEDIASTREAM=$(event.target).contents().find(".dice-rolling-panel__container").get(0).captureStream(0);
-			
-			
-			if(window.JOINTHEDICESTREAM){
-				// we should tear down and reconnect
-				for(let i in window.STREAMPEERS){
-					console.log("replacing the track")
-					window.STREAMPEERS[i].getSenders()[0].replaceTrack(window.MYMEDIASTREAM.getVideoTracks()[0]);
+				firstTime = true;
+			let diceRollPanel = $(event.target).contents().find(".dice-rolling-panel__container");
+			if (diceRollPanel.length > 0) {
+				window.MYMEDIASTREAM = diceRollPanel.get(0).captureStream(0);
+
+
+				if (window.JOINTHEDICESTREAM) {
+					// we should tear down and reconnect
+					for (let i in window.STREAMPEERS) {
+						console.log("replacing the track")
+						window.STREAMPEERS[i].getSenders()[0].replaceTrack(window.MYMEDIASTREAM.getVideoTracks()[0]);
+					}
 				}
-			}
-			
-			if(firstTime)
-				$("#stream_button").click();
+
+				/*if (firstTime)
+					$("#stream_button").click();*/
+            }
 				
 		}
 
 		// CHARACTER
-		let tokenid = sheet_url;
+		let tokenid = $(event.target).attr('src');
 		var synchp = function() {
-			console.log('sinco HP');
-			var hp_element = $(event.target).contents().find(".ct-health-summary__hp-group--primary > div:nth-child(1) .ct-health-summary__hp-number");
+			var hp_element = $(event.target).contents().find(".ct-health-summary__hp-group--primary > div:nth-child(1) .ct-health-summary__hp-number,ct-status-summary-mobile__hp-current");
 
 			if (hp_element.length > 0) {
 				var current_hp = hp_element.html();
-				var max_hp = $(event.target).contents().find(".ct-health-summary__hp-group--primary > div:nth-child(3) .ct-health-summary__hp-number").html();
+				var max_hp = $(event.target).contents().find(".ct-health-summary__hp-group--primary > div:nth-child(3) .ct-health-summary__hp-number,ct-status-summary-mobile__hp-max").html();
 			}
 			else {
 				var current_hp = 0;
@@ -682,7 +760,12 @@ function open_player_sheet(sheet_url) {
 					max_hp = window.PLAYERDATA.max_hp;
 				else
 					max_hp = 0;
+			}
 
+			var temp_hp = 0;
+			var temp_hp_element = $(event.target).contents().find(".ct-health-summary__hp-item--temp > .ct-health-summary__hp-item-content > .ct-health-summary__hp-number ");
+			if (temp_hp_element.length > 0) {
+				temp_hp = temp_hp_element.html();
 			}
 
 
@@ -701,7 +784,7 @@ function open_player_sheet(sheet_url) {
 				return val.indexOf('+') >= 0 || val.indexOf('-') >= 0;
 			}
 
-			$(event.target).contents().find('.ct-quick-info__ability').each(function() {
+			$(event.target).contents().find('.ct-quick-info__ability,.ct-main-mobile__ability').each(function() {
 				let abilityScores;
 				if (isScore($(this).find('.ddbc-ability-summary__secondary').text())) {
 					abilityScores = {
@@ -723,9 +806,10 @@ function open_player_sheet(sheet_url) {
 
 
 			var playerdata = {
-				id: sheet_url,
+				id: tokenid,
 				hp: current_hp,
 				max_hp: max_hp,
+				temp_hp: temp_hp,
 				ac: $(event.target).contents().find(".ddbc-armor-class-box__value").html(),
 				pp: pp.html(),
 				conditions: conditions,
@@ -748,7 +832,12 @@ function open_player_sheet(sheet_url) {
 		};
 
 		// DETECT CHANGES ON HEALTH, WAIT 1 SECOND AND LOCK TO AVOID TRIGGERING IT TOO MUCH AND CAUSING ISSUES
-		$(event.target).contents().find("#site").on("DOMSubtreeModified", ".ct-quick-info__health,.ct-combat__statuses-group--conditions,.ct-inspiration__status", function() {
+		
+		
+		// DISABLED SINCE WE NOW READ JSON DATA FOR THE CHARACTER. 
+		/* 
+		$(event.target).contents().find("#site").on("DOMSubtreeModified", ".ct-quick-info__health,.ct-combat__statuses-group--conditions,"+
+			".ct-inspiration__status,.ct-combat__summary-group--ac,.ct-speed-box__box-value", function() {
 			if (window.WAITING_FOR_SYNCHP)
 				return;
 			else {
@@ -759,7 +848,7 @@ function open_player_sheet(sheet_url) {
 				}, 1000);
 			}
 		});
-
+		*/ 
 		var mutation_target = $(event.target).contents().get(0);
 		var mutation_config = { attributes: false, childList: true, characterData: false, subtree: true };
 
@@ -820,11 +909,12 @@ function open_player_sheet(sheet_url) {
 
 		observer.observe(mutation_target, mutation_config);
 
-		const waitToSync = (timeElapsed = 0) => {
+		/*const waitToSync = (timeElapsed = 0) => {
 			setTimeout(() => {
-				var ac_element = $(event.target).contents().find(".ct-combat .ddbc-armor-class-box");
+				var ac_element = $(event.target).contents().find(".ct-combat .ddbc-armor-class-box,ct-combat-mobile__extra--ac");
 				if (ac_element.length > 0) {
 					synchp();
+					$(event.target).attr('data-init_load', 1);
 				} else {
 					if (timeElapsed < 15000) {
 						waitToSync(timeElapsed + 500);
@@ -832,69 +922,163 @@ function open_player_sheet(sheet_url) {
 				}
 			}, 500);
 		};
-		waitToSync();
-		//setTimeout(function(){$(event.target).contents().find(".ct-character-header__group--game-log").remove();},10000); // AND OTHER HACK!
+		waitToSync();*/
 	});
-	$("#site").append(container);
-
-	if (!window.DM) {
-		sheet_button = $("<button id='sheet_button' class='hasTooltip button-icon hideable' data-name='Show/hide character sheet (SPACE)'>SHEET</button>");
-		sheet_button.css("position", "absolute");
-		sheet_button.css("top", 0);
-		sheet_button.css("left", -86);
-		sheet_button.css("z-index", 999999);
-
-		$(".sidebar__controls").append(sheet_button);
-		$(window.document.body).append(container);
-
-		sheet_button.click(function(e) {
-			if (container.css("z-index") > 0) {
-				container.animate({
-					right: 343 - 1530,
-					'z-index': 0
-				}, 500);
-
-				container.css('width', '1030');
-				
-				if(window.STREAMTASK){
-					clearInterval(window.STREAMTASK);
-					window.STREAMTASK=false;
-				}
-
-				return;
-			}
-			//container.height($(".sidebar__inner").height());
-			container.height($(".sidebar__inner").height() - 20);
-			
-			if(window.JOINTHEDICESTREAM){
-				iframe.contents().find(".dice-rolling-panel__container").get(0).height=600;
-				iframe.contents().find(".dice-rolling-panel__container").height(600);
-				
-				if(!window.STREAMTASK){
-						window.STREAMTASK=setInterval(() => {
-							if(window.MYMEDIASTREAM.requestFrame)
-								window.MYMEDIASTREAM.requestFrame(); // Firefox :( 
-							else
-							window.MYMEDIASTREAM.getVideoTracks()[0].requestFrame(); // Chrome :|
-						} ,1000 / 30)
-				}
-			}
-			
-			iframe.height(container.height() - 20);
-
-			container.css("z-index", 99999999);
-			container.animate({
-				//right: $(".sidebar__inner").width()
-				right: 343 + parseInt($(".sidebar").css("right"))
-			}, 500);
-
-		});
+	
+	if((!window.DM) ||(window.KEEP_PLAYER_SHEET_LOADED))
+	{
+		var loadSheet = function (sheetFrame, sheet_url) {
+			sheetFrame.attr('src', sheet_url);
+		};
+		setTimeout(loadSheet, loadWait,iframe,pc_sheet);
 	}
+}
 
-
+function init_player_sheets()
+{
+	// preload character sheets
+	// wait a few seconds before actually loading the iframes, and wait a second between each load to avoid 429 errors
+	var sheetLoadWait = 4000;
+	window.pcs.forEach(function(pc, index) {
+		init_player_sheet(pc.sheet, sheetLoadWait);
+		sheetLoadWait += 1500;
+	});
 }
 
 
+function open_player_sheet(sheet_url, closeIfOpen = true) {
+
+	let container = $("#sheet");
+	let iframe = $("[id='PlayerSheet"+getPlayerIDFromSheet(sheet_url)+"']");
+	if(iframe.height() == 0)
+	{
+		// Open the sheet
+		if(window.DM)
+		{
+			$("#sheet").find("iframe").each(function(){
+				
+				if($(this).attr('data-sheet_url') == sheet_url)
+				{
+					if($(this).attr('src') !== sheet_url)
+					{
+						console.log("loading player sheet" + sheet_url);
+						$(this).attr('src', sheet_url);
+					}
+				}
+				else
+				{
+					//unlock and hide any other open sheets
+					if($(this).css('height') !== '0px')
+					{
+						close_player_sheet($(this).attr('data-sheet_url'), false);
+					}
+				}
+			});
+			
+			// lock this sheet
+			data = {
+				player_sheet: sheet_url
+			};
+			window.MB.sendMessage("custom/myVTT/lock", data);
+		}
+		else
+		{
+			if (window.JOINTHEDICESTREAM) {
+				let diceRollPanel = iframe.contents().find(".dice-rolling-panel__container");
+				if (diceRollPanel.length > 0) {
+					diceRollPanel.get(0).height = 600;
+					diceRollPanel.height(600);
+
+					if (!window.STREAMTASK) {
+						window.STREAMTASK = setInterval(() => {
+							if (window.MYMEDIASTREAM.requestFrame)
+								window.MYMEDIASTREAM.requestFrame(); // Firefox :( 
+							else
+								window.MYMEDIASTREAM.getVideoTracks()[0].requestFrame(); // Chrome :|
+						}, 1000 / 30)
+					}
+				}
+			}
+		}
+		
+		// show sheet container and sheet iframe
+		$("#sheet").find("button").css('display', 'inherit');
+		container.css("z-index", 99999999);
+		var containerHeight = $(".sidebar__inner").height() - 20;
+		var iframeHeight = containerHeight -20;
+		container.animate({
+			//right: $(".sidebar__inner").width()
+			right: 343 + parseInt($(".sidebar").css("right")),
+			height: containerHeight
+		}, 500);
+		iframe.animate({
+			height: iframeHeight
+		}, 500);
+		
+		// reload if there have been changes
+		if(iframe.attr('data-changed') == 'true')
+		{
+			iframe.attr('data-changed','false');
+			iframe.attr('src', function(i, val) { return val; });
+		}
+	}
+	else if (closeIfOpen)
+	{
+		//sheet is already open, close the sheet
+		close_player_sheet(sheet_url);
+	}
+}
+
+function close_player_sheet(sheet_url, hide_container = true)
+{
+	let container = $("#sheet");
+	let iframe = $("[id='PlayerSheet"+getPlayerIDFromSheet(sheet_url)+"']");
+	// hide the buttons first, they tend to float over everything
+	if(hide_container)
+	{
+		container.find("button").css('display', 'none');
+		if (container.css("z-index") > 0) {
+			container.animate({
+							right: 343 - 1530,
+							'z-index': 0,
+							height: 0
+						}, 500);
+		}
+	}
+	setTimeout(function(_iframe){
+		console.log("animating close sheet" + _iframe.attr('data-sheet_url'));
+		_iframe.animate({
+			height:0
+		},500);
+	},50, iframe)
+	
+	if(window.DM)
+	{
+		data = {
+			player_sheet: sheet_url
+		};
+		window.MB.sendMessage("custom/myVTT/unlock", data);
+		if(!window.KEEP_PLAYER_SHEET_LOADED)
+		{
+			setTimeout(function(_iframe){
+				console.log("closing sheet" + _iframe.attr('data-sheet_url'));
+				_iframe.attr('src','');
+			},500, iframe)
+		}
+	}
+	else
+	{
+		if(window.STREAMTASK){
+				clearInterval(window.STREAMTASK);
+				window.STREAMTASK=false;
+			}
+			
+			data = {
+				player_sheet: window.PLAYER_SHEET
+			};
+			window.MB.sendMessage("custom/myVTT/player_sheet_closed", data);
+	}
+}
 
 function init_ui() {
 	window.STARTING = true;
@@ -909,7 +1093,9 @@ function init_ui() {
 	window.TOKEN_SETTINGS = $.parseJSON(localStorage.getItem('TokenSettings' + gameid)) || {};
 	window.CURRENTLY_SELECTED_TOKENS = [];
 	window.TOKEN_PASTE_BUFFER = [];
+	window.TOKEN_OBJECTS_RECENTLY_DELETED = {};
 
+	window.CAMPAIGN_SECRET=$(".ddb-campaigns-invite-primary").text().split("/").pop();
 	window.MB = new MessageBroker();
 	window.StatHandler = new StatHandler();
 	
@@ -1060,8 +1246,7 @@ function init_ui() {
 			
 			
 			if(validateUrl(text)){
-
-				text="<img width=200 src='"+parse_img(text)+"'>";
+				text="<img width=200 class='magnify' href=" + parse_img(text) + " src='" + parse_img(text) + "' alt='Chat Image'>";
 			}
 			
 			data = {
@@ -1200,26 +1385,32 @@ function init_ui() {
 	if (!DM) {
 		setTimeout(function() {
 			window.MB.sendMessage("custom/myVTT/syncmeup");
+			window.MB.sendMessage("custom/myVTT/playerjoin");
 		}, 5000);
 	}
 
 	init_controls();
-	//if (window.DM)
-		init_pclist();
+	init_sheet();
+	init_pclist();
+	if(window.DM)
+	{
+		init_player_sheets();
+	}
+	else
+	{
+		setTimeout(function() {
+			window.MB.sendMessage("custom/myVTT/syncmeup");
+			window.MB.sendMessage("custom/myVTT/playerjoin");
+			init_player_sheet(window.PLAYER_SHEET);
+			//open_player_sheet(window.PLAYER_SHEET, false);
+		}, 5000);
+	}
 
 	$(".sidebar__pane-content").css("background", "rgba(255,255,255,1)");
 
 
 	init_buttons();
 	init_stream_button();
-
-	if (!window.DM) {
-
-		open_player_sheet(window.PLAYER_SHEET, true);
-
-		iframe = $("#sheet");
-
-	}
 
 	// ZOOM BUTTON
 	zoom_section = $("<div id='zoom_buttons' />");
@@ -1267,10 +1458,14 @@ function init_ui() {
 	init_audio();
 	init_settings();
 	
-	setTimeout(function() {
-		window.ScenesHandler.switch_scene(window.ScenesHandler.current_scene_id, ct_load); // LOAD THE SCENE AND PASS CT_LOAD AS CALLBACK
-	}, 5000);
+	if (window.DM) {
+		setTimeout(function() {
+			window.ScenesHandler.switch_scene(window.ScenesHandler.current_scene_id, ct_load); // LOAD THE SCENE AND PASS CT_LOAD AS CALLBACK
 
+			// also sync the journal
+			window.JOURNAL.sync();
+		}, 5000);
+	}
 	setTimeout(function() {
 		window.STARTING = false;
 	}, 6000);
@@ -1297,6 +1492,8 @@ function init_ui() {
 		curYPos = m.pageY;
 		curXPos = m.pageX;
 		if (m.button == 2) { // ONLY THE RIGHT CLICK
+			if($(m.target).closest($(".context-menu-root")).length>0 ) // AVOID RIGHT CLICK TRAP
+				return;
 			//e.preventDefault();
 			curDown = true;
 			$("body").css("cursor", "grabbing");
@@ -1343,6 +1540,28 @@ function init_ui() {
 	init_mouse_zoom()
 
 	init_help_menu();
+
+
+	init_journal($("#message-broker-client").attr("data-gameId"));
+	
+	if (window.DM) {
+		// use DDB character tools to update character info
+		loadScript("https://media.dndbeyond.com/character-tools/vendors~characterTools.bundle.dec3c041829e401e5940.min.js",
+			function () {
+				window.character_tools_loaded = true;
+			});
+		window.load_rules_task = setInterval(function () {
+			if (window.character_tools_loaded) {
+				clearInterval(window.load_rules_task);
+				// Load DDB character modules and rules
+				retriveRules();
+				loadModules(initalModules);
+				//window.character_update_task = setInterval(get_pclist_player_data, 10000);
+				// we now just reads all the character sheet once at load time after a while
+				setTimeout(get_pclist_player_data,15000);
+			}
+		}, 1000);
+	}
 }
 
 function init_buttons() {
@@ -1414,6 +1633,7 @@ function init_buttons() {
 	draw_menu.append("<div><button id='draw_circle' style='width:75px' class='drawbutton menu-option draw-option' data-shape='arc' data-type='draw'>Circle</button></div>");
 	draw_menu.append("<div><button id='draw_cone' style='width:75px' class='drawbutton menu-option draw-option' data-shape='cone' data-type='draw'>Cone</button></div>");
 	draw_menu.append("<div><button id='draw_line' style='width:75px' class='drawbutton menu-option draw-option' data-shape='line' data-type='draw'>Line</button></div>");
+	draw_menu.append("<div><button id='draw_brush' style='width:75px' class='drawbutton menu-option draw-option' data-shape='brush' data-type='draw'>Brush</button></div>");
 	draw_menu.append("<div><button id='draw_polygon' style='width:75px' class='drawbutton menu-option draw-option' data-shape='polygon' data-type='draw'>Polygon</button></div>");
 	draw_menu.append("<div><button id='draw_erase' style='width:75px' class='drawbutton menu-option draw-option' data-shape='rect' data-type='eraser'>Erase</button></div>");
 	
@@ -1468,6 +1688,8 @@ function init_buttons() {
 		$(this).css('background', 'green');
 	});
 
+	draw_menu.append("<div style='font-weight:bold'>Line Width</div>");
+	draw_menu.append("<div><input id='draw_line_width' type='range' style='width:75px' min='1' max='60' value='6' class='drawWidthSlider'></div>");
 
 	draw_menu.css("position", "fixed");
 	draw_menu.css("top", "25px");
@@ -1540,13 +1762,13 @@ function init_stream_button() {
 	else
 		stream_button.css("left", "-247px");
 
-	stream_button.css("background", "yellow");
+	//stream_button.css("background", "yellow");
 
 	if (!$.browser.mozilla) { // DISABLE FOR FIREFOX
 		$(".sidebar__controls").append(stream_button);
-		if(window.DM){
+		/*if(window.DM){
 			setTimeout( () => {stream_button.click()} , 5000); 
-		}
+		}*/
 	}
 	
 	
@@ -1557,7 +1779,7 @@ function init_stream_button() {
 $(function() {
 	window.EXTENSION_PATH = $("#extensionpath").attr('data-path');
 	var is_dm=false;
-	if($(".ddb-campaigns-detail-body-dm-notes-label").length>0){
+	if($(".ddb-campaigns-detail-body-dm-notes-private").length>0){
 		is_dm=true;
 	}
 	
@@ -1593,6 +1815,7 @@ $(function() {
 			window.PLAYER_IMG = img;
 			window.PLAYER_SHEET = sheet;
 			window.PLAYER_NAME = name;
+			window.PLAYER_ID = getPlayerIDFromSheet(sheet);
 			window.DM = false;
 			init_ui();
 		});
@@ -1611,6 +1834,8 @@ $(function() {
 			localStorage.removeItem("current_chapter" + gameid);
 			localStorage.removeItem("current_scene" + gameid);
 			localStorage.removeItem("CombatTracker"+gameid);
+			localStorage.removeItem("Journal"+gameid);
+			localStorage.removeItem("JournalChapters"+gameid);
 		}
 		else {
 			console.log('user canceled');
@@ -1640,7 +1865,7 @@ $(function() {
 	campaign_banner.append("If you need help, or just want to send us your feedback, join the <a target='_blank' href='https://discord.gg/cMkYKqGzRh'>AboveVTT Discord Community</a>.<br>");
 	campaign_banner.append("Do you like what you see? Then please support me on <a target='_blank' href='https://www.patreon.com/AboveVTT'>AboveVTT Patreon!</a><br><br>");
 	campaign_banner.append("<b>Advanced</b><br>If you are not the DM of this campaign but would like to join as the DM then <a class='joindm'>click here</a>.<br>");
-	campaign_banner.append("(Please note that <b>you will not be able to see the other DM's data</b>.)<br>Do <b>NOT</b> press this if there's already another DM connected<br><br>");
+	campaign_banner.append("(Please note that <b>you will not be able to see the other DM's data, and all active player sheets must be public</b>.)<br>Do <b>NOT</b> press this if there's already another DM connected, or if you cannot view all active player sheets<br><br>");
 	campaign_banner.append("Use this button to delete all locally held data, to 'clear the cache' as it were: <br>");
 	campaign_banner.append(delete_button);
 	campaign_banner.append(delete_button2);
@@ -1664,6 +1889,7 @@ $(function() {
 			window.DM = true;
 			window.PLAYER_SHEET = false;
 			window.PLAYER_NAME = "THE DM";
+			window.PLAYER_ID = false;
 			window.PLAYER_IMG = 'https://media-waterdeep.cursecdn.com/attachments/thumbnails/0/14/240/160/avatar_2.png';
 			init_ui();
 		});

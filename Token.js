@@ -80,6 +80,21 @@ class Token {
 		if (this.persist != null)
 			this.persist();
 	}
+	delete(persist=true) {
+		if (!window.DM) return; // only allow DMs to delete tokens
+		ct_remove_token(this, false);
+		let id = this.options.id;
+		let selector = "div[data-id='" + id + "']";
+		$(selector).remove();
+		delete window.ScenesHandler.scene.tokens[id];
+		delete window.TOKEN_OBJECTS[id];
+		$("#aura_" + id.replaceAll("/", "")).remove();
+		if (persist == true) {
+			window.ScenesHandler.persist();
+			window.ScenesHandler.sync();
+			draw_selected_token_bounding_box(); // redraw the selection box
+		}
+	}
 	rotate(newRotation) {
 		if (this.options.locked) return; // don't allow rotation if the token is locked
 		this.update_from_page();
@@ -88,10 +103,42 @@ class Token {
 		// this just rotates locally to help with performance.
 		// draggable.stop will call place_sync_persist to finalize the rotation. 
 		// If we ever want this to send to all players in real time, simply comment out the rest of this function and call place_sync_persist() instead.
-		const scale = (((this.options.size - 15) * 100) / this.options.size) / 100;
+		let scale = (((this.options.size - 15) * 100) / this.options.size) / 100;
+		if ( !(this.options.max_hp) > 0 || (this.options.disableaura))
+			scale=1;
+		
 		var selector = "div[data-id='" + this.options.id + "']";
 		var tokenElement = $("#tokens").find(selector);
-		tokenElement.find("img").css("transform", "scale(" + scale + ") rotate(" + newRotation + "deg)");		
+		
+		tokenElement.find("img").css("transform", "scale(" + scale + ") rotate(" + newRotation + "deg)");
+		
+	}
+	moveUp() {
+		let newTop = `${parseFloat(this.options.top) - parseFloat(window.CURRENT_SCENE_DATA.vpps)}px`;
+		this.move(newTop, this.options.left)
+	}
+	moveDown() {
+		let newTop = `${parseFloat(this.options.top) + parseFloat(window.CURRENT_SCENE_DATA.vpps)}px`;
+		this.move(newTop, this.options.left)
+	}
+	moveLeft() {
+		let newLeft = `${parseFloat(this.options.left) - parseFloat(window.CURRENT_SCENE_DATA.hpps)}px`;
+		this.move(this.options.top, newLeft)
+	}
+	moveRight() {
+		let newLeft = `${parseFloat(this.options.left) + parseFloat(window.CURRENT_SCENE_DATA.hpps)}px`;
+		this.move(this.options.top, newLeft)
+	}
+	move(top, left) {
+		if (this.options.locked) return; // don't allow moving if the token is locked
+		this.update_from_page();
+		this.options.top = top;
+		this.options.left = left;
+		this.place(100);
+		this.sync();
+		if (this.persist != null) {
+			this.persist();
+		}
 	}
 	place_sync_persist() {
 		this.place();
@@ -163,6 +210,11 @@ class Token {
 		console.log("update from page di " + this.options.id);
 		var selector = "div[data-id='" + this.options.id + "']";
 		var old = $("#tokens").find(selector);
+
+		if(old.is(':animated')){
+			old.stop(true,true); // stop the animation and jump to the end.
+		}
+
 		this.options.left = old.css("left");
 		this.options.top = old.css("top");
 		//this.options.hpstring=old.find(".hpbar").val();
@@ -172,21 +224,23 @@ class Token {
 		else
 			delete this.options.hidden;
 
-
 		if ( ( (!(this.options.monster > 0)) || window.DM || (!window.DM && this.options.hidestat)) && !this.options.disablestat && old.find(".hp").length > 0) {
 			if (old.find(".hp").val().startsWith("+") || old.find(".hp").val().startsWith("-")) {
-				old.find(".hp").val(parseInt(this.options.hp) + parseInt(old.find(".hp").val()));
+				old.find(".hp").val(Math.max(0, parseInt(this.options.hp) + parseInt(old.find(".hp").val())));
 			}
 			if (old.find(".max_hp").val().startsWith("+") || old.find(".max_hp").val().startsWith("-")) {
-				old.find(".max_hp").val(parseInt(this.options.max_hp) + parseInt(old.find(".max_hp").val()));
+				old.find(".max_hp").val(Math.max(0, parseInt(this.options.max_hp) + parseInt(old.find(".max_hp").val())));
 			}
 			$("input").blur();
 
 			this.options.hp = old.find(".hp").val();
 			this.options.max_hp = old.find(".max_hp").val();
 
-			const scale = (((this.options.size - 15) * 100) / this.options.size) / 100;
-
+			let scale = (((this.options.size - 15) * 100) / this.options.size) / 100;
+			
+			if (!(this.options.max_hp) > 0 || (this.options.disableaura))
+				scale = 1;
+			
 			// HEALTH AURA
 			if (this.options.max_hp > 0 && !this.options.disableaura) {
 				if (this.options.max_hp > 0 && parseInt(this.options.hp) === 0) {
@@ -314,7 +368,7 @@ class Token {
 	}
 
 	build_conditions(parent) {
-
+		let self=this;
 		let bar_width = Math.floor(this.options.size * 0.2);
 		const cond = $("<div class='conditions' style='padding:0;margin:0'/>");
 		const moreCond = $(`<div class='conditions' style='left:${bar_width}px;'/>`);
@@ -328,7 +382,7 @@ class Token {
 			cond_bar.height(this.options.size - bar_width);
 		})
 
-		const conditionsTotal = this.options.conditions.length + this.options.custom_conditions.length;
+		const conditionsTotal = this.options.conditions.length + this.options.custom_conditions.length + (this.options.id in window.JOURNAL.notes && (window.DM || window.JOURNAL.notes[this.options.id].player));
 
 		if (conditionsTotal > 0) {
 			let conditionCount = 0;
@@ -395,8 +449,34 @@ class Token {
 				
 				conditionCount++;
 			}
-		}
+			// CHECK IF ADDING NOTE CONDITION
+			if (this.options.id in window.JOURNAL.notes && (window.DM || window.JOURNAL.notes[this.options.id].player)) {
+				console.log("aggiungerei nota");
+				const conditionName = "note"
+				const conditionContainer = $(`<div id='${conditionName}' class='condition-container' />`);
+				const symbolImage = $("<img class='condition-img note-condition' src='" + window.EXTENSION_PATH + "assets/conditons/note.svg'/>");
 
+
+				conditionContainer.dblclick(function(){
+					window.JOURNAL.display_note(self.options.id);
+				})
+				symbolImage.attr('title', window.JOURNAL.notes[this.options.id].plain);
+				conditionContainer.css('width', symbolSize + "px");
+				conditionContainer.css("height", symbolSize + "px");
+				symbolImage.height(symbolSize + "px");
+				symbolImage.width(symbolSize + "px");
+				conditionContainer.append(symbolImage);
+				if (conditionCount >= 3) {
+					moreCond.append(conditionContainer);
+				} else {
+					cond.append(conditionContainer);
+				}
+				conditionCount++;
+			}
+
+		}
+				
+		
 		if (parent) {
 			parent.find(".conditions").remove();
 			parent.append(cond);
@@ -407,7 +487,14 @@ class Token {
 	}
 
 
-	place() {
+	place(animationDuration) {
+		if(!window.CURRENT_SCENE_DATA){
+			// No scene loaded!
+			return;
+		}
+		if (animationDuration == undefined || parseFloat(animationDuration) == NaN) {
+			animationDuration = 1000;
+		}
 		console.log("cerco id" + this.options.id);
 		var selector = "div[data-id='" + this.options.id + "']";
 		var old = $("#tokens").find(selector);
@@ -423,11 +510,20 @@ class Token {
 			console.log("trovato!!");
 
 			if (old.css("left") != this.options.left || old.css("top") != this.options.top)
+				
+				remove_selected_token_bounding_box();
+				if(old.is(':animated')){
+					old.stop(true,true);
+				}
+				
 				old.animate(
 					{
 						left: this.options.left,
 						top: this.options.top,
-					}, { duration: 1500, queue: false });
+					}, { duration: animationDuration, queue: false, complete: function() {
+						draw_selected_token_bounding_box();
+					} });
+				
 
 
 			// CONCENTRATION REMINDER
@@ -446,7 +542,9 @@ class Token {
 				old.find(".ac").show();
 			}
 
-			const scale = (((this.options.size - 15) * 100) / this.options.size) / 100;
+			let scale = (((this.options.size - 15) * 100) / this.options.size) / 100;
+			if (!(this.options.max_hp) > 0 || (this.options.disableaura))
+				scale = 1;
 			var rotation = 0;
 			if (this.options.rotation != undefined) {
 				rotation = this.options.rotation;
@@ -573,7 +671,9 @@ class Token {
 		else {
 			var tok = $("<div/>");
 			var hpbar = $("<input class='hpbar'>");
-			const scale = (((this.options.size - 15) * 100) / this.options.size) / 100;
+			let scale = (((this.options.size - 15) * 100) / this.options.size) / 100;
+			if (!(this.options.max_hp) > 0 || (this.options.disableaura))
+				scale = 1;
 			var bar_height = Math.floor(this.options.size * 0.2);
 
 			if (bar_height > 60)
@@ -787,6 +887,9 @@ class Token {
 					window.DRAGGING = true;
 					click.x = event.clientX;
 					click.y = event.clientY;
+					if(tok.is(":animated")){
+						tok.stop(true,true);	
+					}
 
 					console.log("Click x: " + click.x + " y: " + click.y);
 
@@ -796,6 +899,9 @@ class Token {
 						for (let id in window.TOKEN_OBJECTS) {
 							if (window.TOKEN_OBJECTS[id].selected) {
 								$("[data-id='"+id+"']").addClass("pause_click");
+								if($("[data-id='"+id+"']").is(":animated")){
+									$("[data-id='"+id+"']").stop(true,true);
+								}
 								if (id != self.options.id) {
 									var curr = window.TOKEN_OBJECTS[id];
 									curr.orig_top = curr.options.top;
@@ -977,6 +1083,15 @@ function token_button(e, tokenIndex = null, tokenTotal = null) {
 		id = uuid();
 	}
 
+	// if this is a player token, check if the token is already on the map
+	if(id in window.TOKEN_OBJECTS){
+		if(window.TOKEN_OBJECTS[id].isPlayer())
+		{
+			window.TOKEN_OBJECTS[id].highlight();
+			return;
+		}
+	}
+	
 	options = {
 		id: id,
 		imgsrc: imgsrc,
@@ -1115,20 +1230,7 @@ function menu_callback(key, options, event) {
 	}
 	if (key == "delete") {
 		id = $(this).attr('data-id');
-		$(this).remove();
-		delete window.ScenesHandler.scene.tokens[id];
-		delete window.TOKEN_OBJECTS[id];
-		$("#aura_" + id.replaceAll("/", "")).remove();
-		if ($("#combat_area tr[data-target='" + id + "']").length > 0) {
-			if ($("#combat_area tr[data-target='" + id + "']").attr('data-current') == "1") {
-				$("#combat_next_button").click();
-			}
-			$("#combat_area tr[data-target='" + id + "']").remove(); // delete token from the combat tracker if it's there
-		}
-		ct_persist();
-		window.ScenesHandler.persist();
-		window.ScenesHandler.sync();
-		draw_selected_token_bounding_box(); // clean up the rotation if needed
+		window.TOKEN_OBJECTS[id].delete();
 	}
 	if (key == "token_medium") {
 		id = $(this).attr('data-id'); window.TOKEN_OBJECTS[id].size(Math.round(window.CURRENT_SCENE_DATA.hpps));
@@ -1158,6 +1260,30 @@ function menu_callback(key, options, event) {
 			window.TOKEN_OBJECTS[id].show();
 		}	
 	}
+
+	if ( key =="note_edit") {
+		if (!(id in window.JOURNAL.notes)) {
+			window.JOURNAL.notes[id] = {
+				title: window.TOKEN_OBJECTS[id].options.name,
+				text: '',
+				plain: '',
+				player: false
+			}
+		}
+		window.JOURNAL.edit_note(id);
+	}
+	if( key =="note_view"){
+		window.JOURNAL.display_note(id);
+	}
+	if ( key =="note_delete") {
+		if(id in window.JOURNAL.notes){
+			delete window.JOURNAL.notes[id];
+			window.JOURNAL.persist();
+			window.TOKEN_OBJECTS[id].place();
+		}
+		
+	}
+	
 
 	if (key == "token_combat") {
 		id = $(this).attr('data-id');
@@ -1436,6 +1562,8 @@ function token_menu() {
 				custom_reminders = {}
 				id = $(element).attr('data-id');
 				is_monster = window.TOKEN_OBJECTS[id].options.monster > 0;
+				
+				has_note=id in window.JOURNAL.notes;
 
 				if (!window.TOKEN_OBJECTS[id].options.aura1) {
 					window.TOKEN_OBJECTS[id].options = {
@@ -1664,6 +1792,14 @@ function token_menu() {
 								}
 							}
 						},
+						note_menu:{
+							name: "Notes",
+							items:{
+								note_view: {name: 'View Note', disable: !has_note},
+								note_edit: {name: 'Create/Edit Note'},
+								note_delete: {name: 'Delete Note'},
+							}
+						},
 						sep1: "-------",
 						hp: {
 							type: 'text',
@@ -1689,7 +1825,6 @@ function token_menu() {
 								}
 							}
 						},
-						sep2: '---------',
 						name: {
 							type: 'text',
 							name: 'Name',
@@ -1700,7 +1835,6 @@ function token_menu() {
 								}
 							}
 						},
-						sep3: '----------',
 						imgsrc: {
 							type: 'text',
 							name: 'Custom Image',
@@ -1745,6 +1879,11 @@ function token_menu() {
 					delete ret.items.imgsrc;
 				}
 				
+				if(!has_note){
+					delete ret.items.note_menu.items.note_view;
+					delete ret.items.note_menu.items.note_delete;
+				}
+				
 				if(!window.DM){
 					delete ret.items.sep0;
 					delete ret.items.view;
@@ -1756,6 +1895,7 @@ function token_menu() {
 					delete ret.items.hp;
 					delete ret.items.max_hp;
 					delete ret.items.delete;
+					delete ret.items.note_menu;
 					delete ret.items.name;
 					delete ret.items.sep2;
 					//delete ret.items.imgsrc;
@@ -2237,4 +2377,39 @@ function paste_selected_tokens() {
 	// copy the newly selected tokens in case they paste again, we want them pasted in reference to the newly created tokens
 	copy_selected_tokens();
 	draw_selected_token_bounding_box();
+}
+
+function delete_selected_tokens() {
+	if (!window.DM) return;
+	window.TOKEN_OBJECTS_RECENTLY_DELETED = {};
+	// move all the tokens into a separate list so the DM can "undo" the deletion
+	let tokensToDelete = [];
+	for (id in window.TOKEN_OBJECTS) {
+		let token = window.TOKEN_OBJECTS[id];
+		if (token.selected) {
+			window.TOKEN_OBJECTS_RECENTLY_DELETED[id] = Object.assign({}, token.options);
+			tokensToDelete.push(token);
+		}
+	}
+	// delete these in a separate loop to prevent altering the array while iterating over it
+	for (let i = 0; i < tokensToDelete.length; i++) {
+		tokensToDelete[i].delete(false); // don't persist on each token delete, we'll do that next
+	}
+	window.ScenesHandler.persist();
+	window.ScenesHandler.sync();
+	draw_selected_token_bounding_box(); // redraw the selection box
+	ct_persist();
+}
+
+function undo_delete_tokens() {
+	if (!window.DM) return;
+	for (id in window.TOKEN_OBJECTS_RECENTLY_DELETED) {
+		let options = window.TOKEN_OBJECTS_RECENTLY_DELETED[id];
+		window.ScenesHandler.create_update_token(options);
+		if (options.combat) {
+			// the deleted token was removed from the combat tracker so add it back in
+			ct_add_token(window.TOKEN_OBJECTS[id]);
+		}
+	}
+	window.TOKEN_OBJECTS_RECENTLY_DELETED = {};
 }

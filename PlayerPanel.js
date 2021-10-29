@@ -9,6 +9,9 @@ function init_pclist() {
 
 function update_pclist() {
 
+	// get scroll position
+	var scroll_y = $(".sidebar__pane-content").scrollTop();
+	
 	pcs_list = $("#pcs_list");
 	pcs_list.empty();
 
@@ -17,10 +20,12 @@ function update_pclist() {
 		tmp = $(this).find(".ddb-campaigns-character-card-header-upper-character-info-primary");
 		name = tmp.html();
 		tmp = $(this).find(".user-selected-avatar");
-		if (tmp.length > 0)
-			image = tmp.css("background-image").slice(5, -2); // url("x") TO -> x
-		else
+		if (tmp.length > 0) {
+			const lowResUrl = tmp.css("background-image").slice(5, -2); // url("x") TO -> x
+			image = get_higher_res_url(lowResUrl)
+		} else {
 			image = "/content/1-0-1436-0/skins/waterdeep/images/characters/default-avatar.png";
+		}
 		sheet = $(this).find(".ddb-campaigns-character-card-footer-links-item-view").attr("href");
 
 		pc = {
@@ -133,7 +138,7 @@ function update_pclist() {
 							</div>
 						` : `
 							<div class="player-no-attributes">
-								Please load the character sheet.
+								Character sheet loading, please wait.
 							</div>
 						`
 					}
@@ -194,4 +199,15 @@ function update_pclist() {
 		}
 	});
 
+	// reset scroll position
+	$(".sidebar__pane-content").scrollTop(scroll_y);
+}
+
+// Low res thumbnails have the form https://www.dndbeyond.com/avatars/thumbnails/17/212/60/60/636377840850178381.jpeg
+// Higher res of the same character can be found at  https://www.dndbeyond.com/avatars/17/212/636377840850178381.jpeg
+// This is a slightly hacky method of getting the higher resolution image from the url of the thumbnail.
+function get_higher_res_url(thumbnailUrl) {
+	const thumbnailUrlMatcher = /avatars\/thumbnails\/\d+\/\d+\/\d\d\/\d\d\//;
+	if (!thumbnailUrl.match(thumbnailUrlMatcher)) return thumbnailUrl;
+	return thumbnailUrl.replace(/\/thumbnails(\/\d+\/\d+\/)\d+\/\d+\//, '$1');
 }

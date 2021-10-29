@@ -2,7 +2,7 @@
   "manifest_version": 2,
 "name": "AboveVTT",
 "description": "Integrated VTT for D&DBeyond",
-"version": "0.53",
+"version": "0.59",
 "content_scripts":[
     {
       "matches":[
@@ -41,6 +41,10 @@
 	"Settings.js",
 	"mousetrap.1.6.5.min.js",
 	"KeypressHandler.js",
+	"jquery.magnific-popup.min.js",
+	"magnific-popup.css",
+	"Journal.js",
+	"DnDBeyond/DDBCharacterData.js",
 	"assets/*"
 	]
 }

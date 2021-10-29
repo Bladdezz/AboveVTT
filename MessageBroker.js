@@ -76,6 +76,47 @@ function addVideo(stream,streamerid) {
 
 class MessageBroker {
 
+	loadAboveWS(callback=null){
+		var self=this;
+		if (callback)
+			this.callbackAboveQueue.push(callback);
+		
+		// current dev wss://b2u1l4fzc7.execute-api.eu-west-1.amazonaws.com/v1
+		// current prod wss://blackjackandhookers.abovevtt.net/v1
+		this.abovews = new WebSocket("wss://blackjackandhookers.abovevtt.net/v1?campaign="+window.CAMPAIGN_SECRET);
+		this.abovews.onopen=function(){
+
+		}
+		
+		if (this.loadingAboveWS) {
+			return;
+		}
+
+		this.loadingAboveWS=true;
+		
+		this.abovews.onerror = function() {
+			self.loadingAboveWS = false;
+		};
+
+		this.abovews.onmessage=this.onmessage;
+
+		this.abovews.onopen = function() {
+			self.loadingAboveWS = false;
+			var recovered = false;
+			if (self.callbackAboveQueue.length > 1) {
+				recovered = true;
+			}
+			var cb;
+			console.log('Empting callback queue list');
+			while (cb = self.callbackAboveQueue.shift()) {
+				cb();
+			};
+			if (recovered && (!window.DM)) {
+				console.log('asking the DM for recovery!');
+				self.sendMessage("custom/myVTT/syncmeup");
+			}
+		};
+	}
 
 	loadWS(token, callback = null) {
 
@@ -98,6 +139,8 @@ class MessageBroker {
 
 		this.ws = new WebSocket(url + "?gameId=" + gameid + "&userId=" + userid + "&stt=" + token);
 
+		this.ws.onmessage=this.onmessage;
+
 
 		this.ws.onerror = function() {
 			self.loadingWS = false;
@@ -105,23 +148,94 @@ class MessageBroker {
 
 		this.ws.onopen = function() {
 			self.loadingWS = false;
-			var recovered = false;
-			if (self.callbackQueue.length > 1) {
-				recovered = true;
-			}
 			var cb;
 			console.log('Empting callback queue list');
 			while (cb = self.callbackQueue.shift()) {
 				cb();
 			};
-			if (recovered && (!window.DM)) {
-				console.log('asking the DM for recovery!');
-				self.sendMessage("custom/myVTT/syncmeup");
-			}
-
 		};
 
-		this.ws.onmessage = function(event) { // SCHIFO.. DOVREI FAR REGISTRARE GLI HANDLER ALLA CREAZIONE DELLA MB
+		
+	}
+
+	handle_injected_data(data){
+		let self=this;
+		self.chat_pending_messages.push(data);
+		// start the task
+		
+		if(self.chat_decipher_task==null){
+			self.chat_decipher_task=setInterval(function(){
+				console.log("deciphering");
+				let pend_length = self.chat_pending_messages.length;
+				for(var i=0;i<pend_length;i++){
+					var current=self.chat_pending_messages.shift();
+					
+					var injection_id=current.data.rolls[0].rollType;
+					var injection_data=current.data.injected_data;
+					console.log(injection_id);
+					console.log(injection_data);
+					
+					var found=false;
+					$(".DiceMessage_RollType__wlBsW").each(function(){
+						if($(this).text()==injection_id){
+							console.log("TROVATOOOOOOOOOOOOOOOOO");
+							found=true;
+							let li =$(this).closest("li");
+							let oldheight=li.height();
+							var newlihtml=self.convertChat(injection_data, current.data.player_name==window.PLAYER_NAME ).html();
+							if(newlihtml=="")
+								li.css("display","none"); // THIS IS TO HIDE DMONLY STUFF
+								
+							li.animate({ opacity: 0 }, 250, function() {
+								li.html(newlihtml);
+								let neweight = li.height();
+								li.height(oldheight);
+								li.animate({ opacity: 1, height: neweight }, 250, () => { li.height("") });
+								li.find(".magnify").magnificPopup({type: 'image', closeOnContentClick: true });
+
+								if (injection_data.dmonly && window.DM) { // ADD THE "Send To Player Buttons"
+									let btn = $("<button>Show to Players</button>")
+									li.append(btn);
+									btn.click(() => {
+										li.css("display", "none");
+										delete injection_data.dmonly;
+										self.inject_chat(injection_data); // RESEND THE MESSAGE REMOVING THE "injection only"
+									});
+								}
+							});
+							
+							
+						}
+					});
+					if(!found){
+						self.chat_pending_messages.push(current);
+					}
+				}
+				if(self.chat_pending_messages.length==0){
+					console.log("stop deciphering");
+					clearInterval(self.chat_decipher_task);
+					self.chat_decipher_task=null;
+				}
+			},500);
+		}
+	}
+
+	constructor() {
+		var self = this;
+		
+		this.chat_id=uuid();
+		this.chat_counter=0;
+		this.chat_pending_messages=[];
+		this.chat_decipher_task=null;
+
+		this.callbackQueue = [];
+		this.callbackAboveQueue = [];
+
+		this.userid = $("#message-broker-client").attr("data-userId");
+		this.gameid = $("#message-broker-client").attr("data-gameId");
+		this.url = $("#message-broker-client").attr("data-connectUrl");
+
+		this.onmessage = function(event) {
 			if (event.data == "pong")
 				return;
 
@@ -137,6 +251,12 @@ class MessageBroker {
 			if (msg.eventType == "custom/myVTT/syncmeup") {
 				self.handleSyncMeUp(msg);
 			}
+			if(msg.eventType == "character-sheet/character-update/fulfilled"){
+				if(window.DM)
+					self.handleCharacterUpdate(msg);
+			}
+
+
 			if (msg.eventType == "custom/myVTT/reveal") {
 				window.REVEALED.push(msg.data);
 				redraw_canvas();
@@ -167,7 +287,7 @@ class MessageBroker {
 			if (msg.eventType == "custom/myVTT/lock") {
 				if (window.DM)
 					return;
-				if (msg.data.player_sheet == window.PLAYER_SHEET) {
+				if (getPlayerIDFromSheet(msg.data.player_sheet) == window.PLAYER_ID) {
 					//alert('locked');
 					var lock_display = $("<div id='lock_display'>The DM is looking at your character sheet</p></div>");
 					lock_display.css("font-size", "18px");
@@ -175,7 +295,7 @@ class MessageBroker {
 					lock_display.css('font-weight', "bold");
 					lock_display.css('background', "rgba(255,255,0,0.7)");
 					lock_display.css('position', 'absolute');
-					lock_display.css('top', '0px');
+					lock_display.css('top', '27px');
 					lock_display.css('left', '0px');
 					lock_display.width($("#sheet").width());
 					//lock_display.height($("#sheet").height());
@@ -188,8 +308,10 @@ class MessageBroker {
 			}
 			if (msg.eventType == "custom/myVTT/unlock") {
 				if (window.DM)
+				{
 					return;
-				if (msg.data.player_sheet == window.PLAYER_SHEET) {
+				}
+				else if (getPlayerIDFromSheet(msg.data.player_sheet) == window.PLAYER_ID) {
 					//alert('unlocked');
 					$("#lock_display").remove();
 					$("#sheet iframe").removeAttr('disabled');
@@ -198,6 +320,44 @@ class MessageBroker {
 				}
 			}
 
+			if (msg.eventType == "custom/myVTT/player_sheet_closed") {
+				if (window.DM)
+				{
+					//$("[id='PlayerSheet"+getPlayerIDFromSheet(msg.data.player_sheet)+"']").attr('src', function(i, val) { return val; });
+					$("[id='PlayerSheet"+getPlayerIDFromSheet(msg.data.player_sheet)+"']").attr('data-changed', 'true');
+					return;
+				}
+			}
+			
+			
+			if(msg.eventType=="custom/myVTT/JournalChapters"){
+				if(!window.DM){
+					window.JOURNAL.chapters=msg.data.chapters;
+					window.JOURNAL.build_journal();
+				}
+			}
+			
+			if(msg.eventType=="custom/myVTT/note"){
+				if(!window.DM){
+					window.JOURNAL.notes[msg.data.id]=msg.data.note;
+					
+					window.JOURNAL.build_journal();
+					
+					if(msg.data.id in window.TOKEN_OBJECTS){
+						window.TOKEN_OBJECTS[msg.data.id].place();
+					}
+					
+					if(msg.data.popup)
+						window.JOURNAL.display_note(msg.data.id);
+					
+				}
+			}
+			
+			if(msg.eventType=="custom/myVTT/playerjoin"){
+				if(window.DM){
+					window.JOURNAL.sync();
+				}	
+			}
 			if(msg.eventType=="custom/myVTT/soundpad"){
 				build_soundpad(msg.data.soundpad);
 			}
@@ -375,94 +535,27 @@ class MessageBroker {
 				}
 			}
 		};
-	}
 
-	handle_injected_data(data){
-		let self=this;
-		self.chat_pending_messages.push(data);
-		// start the task
-		
-		if(self.chat_decipher_task==null){
-			self.chat_decipher_task=setInterval(function(){
-				console.log("deciphering");
-				for(var i=0;i<self.chat_pending_messages.length;i++){
-					var current=self.chat_pending_messages.shift();
-					
-					var injection_id=current.data.rolls[0].rollType;
-					var injection_data=current.data.injected_data;
-					console.log(injection_id);
-					console.log(injection_data);
-					
-					var found=false;
-					$(".DiceMessage_RollType__wlBsW").each(function(){
-						if($(this).text()==injection_id){
-							console.log("TROVATOOOOOOOOOOOOOOOOO");
-							found=true;
-							let li =$(this).closest("li");
-							let oldheight=li.height();
-							var newlihtml=self.convertChat(injection_data, current.data.player_name==window.PLAYER_NAME ).html();
-							if(newlihtml=="")
-								li.css("display","none"); // THIS IS TO HIDE DMONLY STUFF
-								
-							li.animate({ opacity: 0 }, 250, function() {
-								li.html(newlihtml);
-								let neweight = li.height();
-								li.height(oldheight);
-								li.animate({ opacity: 1, height: neweight }, 250, () => { li.height("") });
 
-								if (injection_data.dmonly && window.DM) { // ADD THE "Send To Player Buttons"
-									let btn = $("<button>Show to Players</button>")
-									li.append(btn);
-									btn.click(() => {
-										li.css("display", "none");
-										delete injection_data.dmonly;
-										self.inject_chat(injection_data); // RESEND THE MESSAGE REMOVING THE "injection only"
-									});
-								}
-							});
-							
-							
-						}
-					});
-					if(!found){
-						self.chat_pending_messages.push(current);
-					}
-				}
-				if(self.chat_pending_messages.length==0){
-					console.log("stop deciphering");
-					clearInterval(self.chat_decipher_task);
-					self.chat_decipher_task=null;
-				}
-			},500);
-		}
-	}
 
-	constructor() {
-		var self = this;
-		
-		this.chat_id=uuid();
-		this.chat_counter=0;
-		this.chat_pending_messages=[];
-		this.chat_decipher_task=null;
 
-		this.callbackQueue = [];
 
-		this.userid = $("#message-broker-client").attr("data-userId");
-		this.gameid = $("#message-broker-client").attr("data-gameId");
-		this.url = $("#message-broker-client").attr("data-connectUrl");
 
 
 		get_cobalt_token(function(token) {
 			self.loadWS(token);
 		});
 
+		self.loadAboveWS();
+
 
 		setInterval(function() {
 			self.sendPing();
+			self.sendAbovePing();
 		}, 30000);
 	}
 
-    handleCT(data){
+    	handleCT(data){
 		$("#combat_area").empty();
 		ct_load(data);
 	}
@@ -472,36 +565,51 @@ class MessageBroker {
 			return;
 
 		window.PLAYER_STATS[data.id] = data;
-
-		if (data.id in window.TOKEN_OBJECTS) {
-			var cur = window.TOKEN_OBJECTS[data.id];
-
-			console.log("old " + cur.options.hp + " new " + data.hp);
-			console.log(data.conditions);
-			if (typeof cur.options.hp != "undefined" && cur.options.hp > data.hp && cur.options.custom_conditions.includes("Concentration(Reminder)")) {
-				var msgdata = {
-					player: cur.options.name,
-					img: cur.options.imgsrc,
-					text: "<b>Check for concentration!!</b>",
-				};
-
-				window.MB.inject_chat(msgdata);
-			}
-			cur.options.hp = data.hp;
-
-
-			cur.options.max_hp = data.max_hp;
-			cur.options.ac = data.ac;
-			cur.options.conditions = data.conditions;
-
-			cur.place();
-			window.MB.sendMessage('custom/myVTT/token', cur.options);
-		}
+		this.sendTokenUpdateFromPlayerData(data);
 
 		// update combat tracker:
 
 		update_pclist();
 	}
+
+	sendTokenUpdateFromPlayerData(data) {
+		if (data.id in window.TOKEN_OBJECTS) {
+			var cur = window.TOKEN_OBJECTS[data.id];
+
+			// test for any change
+			if ((cur.options.hp != (data.hp + (data.temp_hp ? data.temp_hp : 0))) ||
+				(cur.options.max_hp != data.max_hp) ||
+				(cur.options.ac != data.ac) ||
+				(!areArraysEqualSets(cur.options.conditions, data.conditions)))
+			{
+				console.log(cur.options);
+				console.log(data);
+				console.log("4 expresision list following");
+				console.log((cur.options.hp != (data.hp + (data.temp_hp ? data.temp_hp : 0))));
+				console.log((cur.options.max_hp != data.max_hp));
+				console.log((cur.options.ac != data.ac));
+				console.log((!areArraysEqualSets(cur.options.conditions, data.conditions)));
+				if (typeof cur.options.hp != "undefined" && cur.options.hp > data.hp && cur.options.custom_conditions.includes("Concentration(Reminder)")) {
+					var msgdata = {
+						player: cur.options.name,
+						img: cur.options.imgsrc,
+						text: "<b>Check for concentration!!</b>",
+					};
+
+					window.MB.inject_chat(msgdata);
+				}
+				cur.options.hp = +data.hp + (data.temp_hp ? +data.temp_hp : 0);
+
+
+				cur.options.max_hp = data.max_hp;
+				cur.options.ac = data.ac;
+				cur.options.conditions = data.conditions;
+
+				cur.place();
+				window.MB.sendMessage('custom/myVTT/token', cur.options);
+			}
+		}
+    	}
 	
 	convertChat(data,local=false) {
 		//Security logic to prevent content being sent which can execute JavaScript.
@@ -580,9 +688,10 @@ class MessageBroker {
 			location.reload();
 		}
 
-		if ((!window.DM) && (typeof window.PLAYERDATA !== "undefined")) { // PLAYERS RESEND STATS AFTER SCENE CHANGE.. JUST TO BE SURE
+		// DISABLED THANKS TO POLLING
+		/*if ((!window.DM) && (typeof window.PLAYERDATA !== "undefined")) {
 			window.MB.sendMessage('custom/myVTT/playerdata', window.PLAYERDATA);
-		}
+		}*/
 
 
 		window.TOKEN_OBJECTS = {};
@@ -656,6 +765,23 @@ class MessageBroker {
 			}
 		}
 	}
+
+	handleCharacterUpdate(msg){
+		let characterId=msg.data.characterId;
+
+		window.pcs.forEach(function(pc){
+			
+			if(!pc.sheet.endsWith(characterId)) // we only poll for the characterId that sent this message
+				return;
+
+			getPlayerData(pc.sheet, function (playerData) {
+				window.PLAYER_STATS[playerData.id] = playerData;
+				window.MB.sendTokenUpdateFromPlayerData(playerData);
+				update_pclist();
+        	});
+		});
+		
+	}
 	
 	inject_chat(injected_data) {
 		var msgid = this.chat_id + this.chat_counter++;
@@ -712,6 +838,44 @@ class MessageBroker {
 
 	sendMessage(eventType, data) {
 		var self = this;
+
+		// HAD TO REVERT THIS SINCE MOZILLA FIREFOX ADDON REVIEW IS TAKING A LONG TIME.
+		// NOW CHROME WILL SEND THROUGH THE DDB GAMELOG WHILE ACCEPTING MESSAGES FROM BOTH MESSAGE BROKERS
+		
+		this.sendDDBMB(eventType,data); 
+		// ONCE FIREFOX ACCEPT A > 0.0.58 VERSION COMMENT THE PRECEDING LINE AND UNCOMMENT THE NEXT BLOCK
+
+		/*if(eventType.startsWith("custom")){
+			this.sendAboveMB(eventType,data);
+		}
+		else{
+			this.sendDDBMB(eventType,data);
+		}*/
+	}
+
+	sendAboveMB(eventType,data){
+		var self=this;
+		var message = {
+			action: "sendmessage",
+			campaignId:window.CAMPAIGN_SECRET,
+			eventType: eventType,
+			data: data,
+		}
+		if(window.CURRENT_SCENE_DATA)
+			message.sceneId=window.CURRENT_SCENE_DATA.id;
+		
+		if (this.abovews.readyState == this.ws.OPEN) {
+			this.abovews.send(JSON.stringify(message));
+		}
+		else {
+			self.loadAboveWS(function() {
+				self.abovews.send(JSON.stringify(message));
+			});
+		}
+	}
+
+	sendDDBMB(eventType,data){
+		var self=this;
 		var message = {
 			id: uuid(),
 			//datetime: Date.now(),
@@ -737,7 +901,6 @@ class MessageBroker {
 					self.ws.send(JSON.stringify(message));
 				});
 			});
-
 		}
 	}
 
@@ -749,8 +912,17 @@ class MessageBroker {
 		else {
 			get_cobalt_token(function(token) {
 				self.loadWS(token, null);
-
 			});
+		}
+	}
+
+	sendAbovePing(){
+		self = this;
+		if(this.abovews.readyState == this.abovews.OPEN){
+			this.abovews.send(JSON.stringify({action:"sendmessage",eventType:"custom/myVTT/keepalive"}));
+		}
+		else{
+			self.loadAboveWS(null);
 		}
 	}
 
